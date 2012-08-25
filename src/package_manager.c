@@ -380,7 +380,7 @@ static int request_event_handler(int req_id, const char *pkg_type,
 			request->event_cb(req_id, pkg_type, pkg_name,
 					  event_type,
 					  PACAKGE_MANAGER_EVENT_STATE_STARTED,
-					  0, PACKAGE_MANAGER_ERROR_NONE, data);
+					  0, PACKAGE_MANAGER_ERROR_NONE, request->user_data);
 
 	} else if (strcasecmp(key, "install_percent") == 0
 		   || strcasecmp(key, "progress_percent") == 0) {
@@ -396,7 +396,7 @@ static int request_event_handler(int req_id, const char *pkg_type,
 						  PACAKGE_MANAGER_EVENT_STATE_PROCESSING,
 						  atoi(val),
 						  PACKAGE_MANAGER_ERROR_NONE,
-						  data);
+						  request->user_data);
 		}
 
 	} else if (strcasecmp(key, "error") == 0) {
@@ -415,7 +415,7 @@ static int request_event_handler(int req_id, const char *pkg_type,
 						  PACAKGE_MANAGER_EVENT_STATE_FAILED,
 						  0,
 						  PACKAGE_MANAGER_ERROR_NONE,
-						  data);
+						  request->user_data);
 
 		}
 	} else if (strcasecmp(key, "end") == 0) {
@@ -429,7 +429,7 @@ static int request_event_handler(int req_id, const char *pkg_type,
 							  PACAKGE_MANAGER_EVENT_STATE_COMPLETED,
 							  100,
 							  PACKAGE_MANAGER_ERROR_NONE,
-							  data);
+							  request->user_data);
 			}
 		} else {
 			if (strcasecmp(key, "ok") != 0)
@@ -439,7 +439,7 @@ static int request_event_handler(int req_id, const char *pkg_type,
 							  PACAKGE_MANAGER_EVENT_STATE_FAILED,
 							  0,
 							  PACKAGE_MANAGER_ERROR_NONE,
-							  data);
+							  request->user_data);
 		}
 	}
 
@@ -566,7 +566,7 @@ static int global_event_handler(int req_id, const char *pkg_type,
 			manager->event_cb(pkg_type, pkg_name,
 					  event_type,
 					  PACAKGE_MANAGER_EVENT_STATE_STARTED,
-					  0, PACKAGE_MANAGER_ERROR_NONE, data);
+					  0, PACKAGE_MANAGER_ERROR_NONE, manager->user_data);
 
 	} else if (strcasecmp(key, "install_percent") == 0
 		   || strcasecmp(key, "progress_percent") == 0) {
@@ -582,7 +582,7 @@ static int global_event_handler(int req_id, const char *pkg_type,
 						  PACAKGE_MANAGER_EVENT_STATE_PROCESSING,
 						  atoi(val),
 						  PACKAGE_MANAGER_ERROR_NONE,
-						  data);
+						  manager->user_data);
 		}
 
 	} else if (strcasecmp(key, "error") == 0) {
@@ -601,7 +601,7 @@ static int global_event_handler(int req_id, const char *pkg_type,
 						  PACAKGE_MANAGER_EVENT_STATE_FAILED,
 						  0,
 						  PACKAGE_MANAGER_ERROR_NONE,
-						  data);
+						  manager->user_data);
 
 		}
 	} else if (strcasecmp(key, "end") == 0) {
@@ -615,7 +615,7 @@ static int global_event_handler(int req_id, const char *pkg_type,
 							  PACAKGE_MANAGER_EVENT_STATE_COMPLETED,
 							  100,
 							  PACKAGE_MANAGER_ERROR_NONE,
-							  data);
+							  manager->user_data);
 			}
 		} else {
 			if (strcasecmp(key, "ok") != 0)
@@ -625,7 +625,7 @@ static int global_event_handler(int req_id, const char *pkg_type,
 							  PACAKGE_MANAGER_EVENT_STATE_FAILED,
 							  0,
 							  PACKAGE_MANAGER_ERROR_NONE,
-							  data);
+							  manager->user_data);
 		}
 	}
 

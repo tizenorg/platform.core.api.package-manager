@@ -1,7 +1,7 @@
 #sbs-git:slp/api/package-manager capi-appfw-package-manager 0.1.0 76739af2bfbeb46dc9db0cb3e044f880ddcb9440
 Name:       capi-appfw-package-manager
 Summary:    Package Manager API
-Version: 0.0.2
+Version: 0.0.3
 Release:    1
 Group:      TO_BE/FILLED_IN
 License:    TO BE FILLED IN
