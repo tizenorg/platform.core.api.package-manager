@@ -220,6 +220,19 @@ int package_info_is_removable_package(package_info_h package_info, bool *removab
 
 
 /**
+ * @brief Gets whether the package is preload or not
+ * @param [in] package_info The package information
+ * @param [out] preload The preload info of the package
+ * @return 0 on success, otherwise a negative error value.
+ * @retval #PACKAGE_MANAGER_ERROR_NONE Successful
+ * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY Out of memory
+ * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR IO error
+ */
+int package_info_is_preload_package(package_info_h package_info, bool *preload);
+
+
+/**
  * @brief Checks whether two package information are equal.
  * @param [in] lhs	The first package information to compare
  * @param [in] rhs	The second package information to compare

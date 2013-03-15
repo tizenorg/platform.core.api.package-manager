@@ -45,7 +45,12 @@ typedef enum {
  * @brief Enumeration of event type
  */
 typedef enum {
-	PACAKGE_MANAGER_EVENT_TYPE_INSTALL,
+	PACKAGE_MANAGER_EVENT_TYPE_INSTALL = 0,
+	PACKAGE_MANAGER_EVENT_TYPE_UNINSTALL,
+	PACKAGE_MANAGER_EVENT_TYPE_UPDATE,
+
+	/* These enum will be deprecated. Use above enum instead. */
+	PACAKGE_MANAGER_EVENT_TYPE_INSTALL = 0,
 	PACAKGE_MANAGER_EVENT_TYPE_UNINSTALL,
 	PACAKGE_MANAGER_EVENT_TYPE_UPDATE,
 } package_manager_event_type_e;
@@ -54,7 +59,13 @@ typedef enum {
  * @brief Enumeration of event state
  */
 typedef enum {
-	PACAKGE_MANAGER_EVENT_STATE_STARTED,
+	PACKAGE_MANAGER_EVENT_STATE_STARTED = 0,
+	PACKAGE_MANAGER_EVENT_STATE_PROCESSING,
+	PACKAGE_MANAGER_EVENT_STATE_COMPLETED,
+	PACKAGE_MANAGER_EVENT_STATE_FAILED,
+
+	/* These enum will be deprecated. Use above enum instead. */
+	PACAKGE_MANAGER_EVENT_STATE_STARTED = 0,
 	PACAKGE_MANAGER_EVENT_STATE_PROCESSING,
 	PACAKGE_MANAGER_EVENT_STATE_COMPLETED,
 	PACAKGE_MANAGER_EVENT_STATE_FAILED,
@@ -64,7 +75,11 @@ typedef enum {
  * @brief Enumeration of request mode
  */
 typedef enum {
-	PACAKGE_MANAGER_REQUEST_MODE_DEFAULT,
+	PACKAGE_MANAGER_REQUEST_MODE_DEFAULT = 0,
+	PACKAGE_MANAGER_REQUEST_MODE_QUIET,
+
+	/* These enum will be deprecated. Use above enum instead. */
+	PACAKGE_MANAGER_REQUEST_MODE_DEFAULT = 0,
 	PACAKGE_MANAGER_REQUEST_MODE_QUIET,
 } package_manager_request_mode_e;
 
@@ -72,20 +87,40 @@ typedef enum {
  * @brief Enumeration of move type
  */
 typedef enum {
+	PACKAGE_MANAGER_REQUEST_MOVE_TO_INTERNAL = 0,
+	PACKAGE_MANAGER_REQUEST_MOVE_TO_EXTERNAL,
+
+	/* These enum will be deprecated. Use above enum instead. */
 	PACAKGE_MANAGER_REQUEST_MOVE_TO_INTERNAL = 0,
-	PACAKGE_MANAGER_REQUEST_MOVE_TO_EXTERNAL = 1,
+	PACAKGE_MANAGER_REQUEST_MOVE_TO_EXTERNAL,
 } package_manager_move_type_e;
 
 /**
  * @brief Enumeration of certification compare type
  */
 typedef enum {
-	PACAKGE_MANAGER_COMPARE_MATCH,
+	PACKAGE_MANAGER_COMPARE_MATCH = 0,
+	PACKAGE_MANAGER_COMPARE_MISMATCH,
+	PACKAGE_MANAGER_COMPARE_LHS_NO_CERT,
+	PACKAGE_MANAGER_COMPARE_RHS_NO_CERT,
+	PACKAGE_MANAGER_COMPARE_BOTH_NO_CERT,
+
+	/* These enum will be deprecated. Use above enum instead. */
+	PACAKGE_MANAGER_COMPARE_MATCH = 0,
 	PACAKGE_MANAGER_COMPARE_MISMATCH,
 	PACAKGE_MANAGER_COMPARE_LHS_NO_CERT,
 	PACAKGE_MANAGER_COMPARE_RHS_NO_CERT,
 	PACAKGE_MANAGER_COMPARE_BOTH_NO_CERT,
 } package_manager_compare_result_type_e;
+
+/**
+ * @brief Enumeration of permission type
+ */
+typedef enum {
+	PACKAGE_MANAGER_PERMISSION_NORMAL = 0,
+	PACKAGE_MANAGER_PERMISSION_SIGNATURE,
+	PACKAGE_MANAGER_PERMISSION_PRIVILEGE,
+} package_manager_permission_type_e;
 
 /**
  * @brief Package manager handle
@@ -125,14 +160,14 @@ typedef void (*package_manager_request_event_cb) (
 /**
  * @brief Creates a request handle to the package manager.
  *
- * @remarks The @a request must be released with package_manager_reqeust_destroy() by you.
+ * @remarks The @a request must be released with package_manager_request_destroy() by you.
  * @param [out] request A request handle to be newly created on success
  * @return 0 on success, otherwise a negative error value.
  * @retval #PACKAGE_MANAGER_ERROR_NONE Successful
  * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
  * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY Out of memory
  * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR Internal I/O error
- * @see package_manager_reqeust_destroy()
+ * @see package_manager_request_destroy()
  */
 int package_manager_request_create(package_manager_request_h *request);
 
@@ -145,7 +180,7 @@ int package_manager_request_create(package_manager_request_h *request);
  * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
  * @see package_manager_request_create()
  */
-int package_manager_reqeust_destroy(package_manager_request_h request);
+int package_manager_request_destroy(package_manager_request_h request);
 
 /**
  * @brief Registers a callback function to be invoked when the progress of the request changes.
@@ -399,6 +434,30 @@ int package_manager_compare_package_cert_info(const char *lhs_package_id, const 
  * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR Database error occurred
  */
  int package_manager_compare_app_cert_info(const char *lhs_app_id, const char *rhs_app_id, package_manager_compare_result_type_e *compare_result);
+
+/**
+ * @brief Gets whether the package is preload or not by app_id
+ * @param [in] app_id The ID of the application
+ * @param [out] preload The preload info of the package
+ * @return 0 on success, otherwise a negative error value.
+ * @retval #PACKAGE_MANAGER_ERROR_NONE Successful
+ * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY Out of memory
+ * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR IO error
+ */
+int package_manager_is_preload_package_by_app_id(const char *app_id, bool *preload);
+
+/**
+ * @brief Gets the package  permission type by app_id
+ * @param [in] app_id The ID of the application
+ * @param [out] permission_type The package permission type
+ * @return 0 on success, otherwise a negative error value.
+ * @retval #PACKAGE_MANAGER_ERROR_NONE Successful
+ * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY Out of memory
+ * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR IO error
+ */
+int package_manager_get_permission_type(const char *app_id, package_manager_permission_type_e *permission_type);
 
 #ifdef __cplusplus
 }

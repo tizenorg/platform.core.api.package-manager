@@ -65,6 +65,7 @@ static int _get_packageinfo(const char *package)
 	package_info_installed_storage_type_e storage;
 	bool system;
 	bool removable;
+	bool preload;
 
 
 	ret = package_manager_get_package_info(package, &package_info);
@@ -80,6 +81,7 @@ static int _get_packageinfo(const char *package)
 	package_info_get_installed_storage(package_info, &storage);
 	package_info_is_system_package(package_info, &system);
 	package_info_is_removable_package(package_info, &removable);
+	package_info_is_preload_package(package_info, &preload);
 
 	fprintf(stderr, "pkg \t= [%s]\n", pkg);
 	fprintf(stderr, "label \t= [%s]\n", label);
@@ -89,6 +91,7 @@ static int _get_packageinfo(const char *package)
 	fprintf(stderr, "storage \t= [%d]\n", storage);
 	fprintf(stderr, "system \t= [%d]\n", system);
 	fprintf(stderr, "removable \t= [%d]\n", removable);
+	fprintf(stderr, "preload \t= [%d]\n", preload);
 
 	package_info_foreach_cert_info(package_info, _cert_info_cb, NULL);
 

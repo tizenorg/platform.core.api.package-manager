@@ -173,6 +173,22 @@ int package_manager_client_destroy(package_manager_request_h request)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
+int package_manager_request_destroy(package_manager_request_h request)
+{
+	if (package_manager_client_valiate_handle(request)) {
+		return
+		    package_manager_error
+		    (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
+		     NULL);
+	}
+
+	pkgmgr_client_free(request->pc);
+	request->pc = NULL;
+	free(request);
+
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
+
 int package_manager_request_set_event_cb(package_manager_request_h request,
 					 package_manager_request_event_cb
 					 callback, void *user_data)
@@ -222,7 +238,7 @@ int package_manager_request_set_mode(package_manager_request_h request,
 		     NULL);
 	}
 
-	if (mode == PACAKGE_MANAGER_REQUEST_MODE_QUIET)
+	if (mode == PACKAGE_MANAGER_REQUEST_MODE_QUIET)
 		request->mode = PM_QUIET;
 	else
 		request->mode = PM_DEFAULT;
@@ -238,11 +254,11 @@ static int package_manager_get_event_type(const char *key,
 		return PACKAGE_MANAGER_ERROR_INVALID_PARAMETER;
 
 	if (strcasecmp(key, "install") == 0)
-		*event_type = PACAKGE_MANAGER_EVENT_TYPE_INSTALL;
+		*event_type = PACKAGE_MANAGER_EVENT_TYPE_INSTALL;
 	else if (strcasecmp(key, "uninstall") == 0)
-		*event_type = PACAKGE_MANAGER_EVENT_TYPE_UNINSTALL;
+		*event_type = PACKAGE_MANAGER_EVENT_TYPE_UNINSTALL;
 	else if (strcasecmp(key, "undate") == 0)
-		*event_type = PACAKGE_MANAGER_EVENT_TYPE_UPDATE;
+		*event_type = PACKAGE_MANAGER_EVENT_TYPE_UPDATE;
 	else
 		return PACKAGE_MANAGER_ERROR_INVALID_PARAMETER;
 
@@ -380,12 +396,12 @@ static int request_event_handler(int req_id, const char *pkg_type,
 			return PACKAGE_MANAGER_ERROR_INVALID_PARAMETER;
 
 		__add_event_info(&(request->head), req_id, event_type,
-				 PACAKGE_MANAGER_EVENT_STATE_STARTED);
+				 PACKAGE_MANAGER_EVENT_STATE_STARTED);
 
 		if (request->event_cb)
 			request->event_cb(req_id, pkg_type, pkg_name,
 					  event_type,
-					  PACAKGE_MANAGER_EVENT_STATE_STARTED,
+					  PACKAGE_MANAGER_EVENT_STATE_STARTED,
 					  0, PACKAGE_MANAGER_ERROR_NONE, request->user_data);
 
 	} else if (strcasecmp(key, "install_percent") == 0
@@ -395,11 +411,11 @@ static int request_event_handler(int req_id, const char *pkg_type,
 		     &event_state) == 0) {
 			__update_event_info(&(request->head), req_id,
 					    event_type,
-					    PACAKGE_MANAGER_EVENT_STATE_PROCESSING);
+					    PACKAGE_MANAGER_EVENT_STATE_PROCESSING);
 			if (request->event_cb)
 				request->event_cb(req_id, pkg_type, pkg_name,
 						  event_type,
-						  PACAKGE_MANAGER_EVENT_STATE_PROCESSING,
+						  PACKAGE_MANAGER_EVENT_STATE_PROCESSING,
 						  atoi(val),
 						  PACKAGE_MANAGER_ERROR_NONE,
 						  request->user_data);
@@ -412,13 +428,13 @@ static int request_event_handler(int req_id, const char *pkg_type,
 			     &event_state) == 0) {
 				__update_event_info(&(request->head), req_id,
 						    event_type,
-						    PACAKGE_MANAGER_EVENT_STATE_FAILED);
+						    PACKAGE_MANAGER_EVENT_STATE_FAILED);
 			}
 
 			if (request->event_cb)
 				request->event_cb(req_id, pkg_type,
 						  pkg_name, event_type,
-						  PACAKGE_MANAGER_EVENT_STATE_FAILED,
+						  PACKAGE_MANAGER_EVENT_STATE_FAILED,
 						  0,
 						  PACKAGE_MANAGER_ERROR_NONE,
 						  request->user_data);
@@ -428,11 +444,11 @@ static int request_event_handler(int req_id, const char *pkg_type,
 		if (__find_event_info
 		    (&(request->head), req_id, &event_type,
 		     &event_state) == 0) {
-			if (event_state != PACAKGE_MANAGER_EVENT_STATE_FAILED) {
+			if (event_state != PACKAGE_MANAGER_EVENT_STATE_FAILED) {
 				if (request->event_cb)
 					request->event_cb(req_id, pkg_type,
 							  pkg_name, event_type,
-							  PACAKGE_MANAGER_EVENT_STATE_COMPLETED,
+							  PACKAGE_MANAGER_EVENT_STATE_COMPLETED,
 							  100,
 							  PACKAGE_MANAGER_ERROR_NONE,
 							  request->user_data);
@@ -442,7 +458,7 @@ static int request_event_handler(int req_id, const char *pkg_type,
 				if (request->event_cb)
 					request->event_cb(req_id, pkg_type,
 							  pkg_name, event_type,
-							  PACAKGE_MANAGER_EVENT_STATE_FAILED,
+							  PACKAGE_MANAGER_EVENT_STATE_FAILED,
 							  0,
 							  PACKAGE_MANAGER_ERROR_NONE,
 							  request->user_data);
@@ -583,12 +599,12 @@ static int global_event_handler(int req_id, const char *pkg_type,
 			return PACKAGE_MANAGER_ERROR_INVALID_PARAMETER;
 
 		__add_event_info(&(manager->head), req_id, event_type,
-				 PACAKGE_MANAGER_EVENT_STATE_STARTED);
+				 PACKAGE_MANAGER_EVENT_STATE_STARTED);
 
 		if (manager->event_cb)
 			manager->event_cb(pkg_type, pkg_name,
 					  event_type,
-					  PACAKGE_MANAGER_EVENT_STATE_STARTED,
+					  PACKAGE_MANAGER_EVENT_STATE_STARTED,
 					  0, PACKAGE_MANAGER_ERROR_NONE, manager->user_data);
 
 	} else if (strcasecmp(key, "install_percent") == 0
@@ -598,11 +614,11 @@ static int global_event_handler(int req_id, const char *pkg_type,
 		     &event_state) == 0) {
 			__update_event_info(&(manager->head), req_id,
 					    event_type,
-					    PACAKGE_MANAGER_EVENT_STATE_PROCESSING);
+					    PACKAGE_MANAGER_EVENT_STATE_PROCESSING);
 			if (manager->event_cb)
 				manager->event_cb(pkg_type, pkg_name,
 						  event_type,
-						  PACAKGE_MANAGER_EVENT_STATE_PROCESSING,
+						  PACKAGE_MANAGER_EVENT_STATE_PROCESSING,
 						  atoi(val),
 						  PACKAGE_MANAGER_ERROR_NONE,
 						  manager->user_data);
@@ -615,13 +631,13 @@ static int global_event_handler(int req_id, const char *pkg_type,
 			     &event_state) == 0) {
 				__update_event_info(&(manager->head), req_id,
 						    event_type,
-						    PACAKGE_MANAGER_EVENT_STATE_FAILED);
+						    PACKAGE_MANAGER_EVENT_STATE_FAILED);
 			}
 
 			if (manager->event_cb)
 				manager->event_cb(pkg_type,
 						  pkg_name, event_type,
-						  PACAKGE_MANAGER_EVENT_STATE_FAILED,
+						  PACKAGE_MANAGER_EVENT_STATE_FAILED,
 						  0,
 						  PACKAGE_MANAGER_ERROR_NONE,
 						  manager->user_data);
@@ -631,11 +647,11 @@ static int global_event_handler(int req_id, const char *pkg_type,
 		if (__find_event_info
 		    (&(manager->head), req_id, &event_type,
 		     &event_state) == 0) {
-			if (event_state != PACAKGE_MANAGER_EVENT_STATE_FAILED) {
+			if (event_state != PACKAGE_MANAGER_EVENT_STATE_FAILED) {
 				if (manager->event_cb)
 					manager->event_cb(pkg_type,
 							  pkg_name, event_type,
-							  PACAKGE_MANAGER_EVENT_STATE_COMPLETED,
+							  PACKAGE_MANAGER_EVENT_STATE_COMPLETED,
 							  100,
 							  PACKAGE_MANAGER_ERROR_NONE,
 							  manager->user_data);
@@ -645,7 +661,7 @@ static int global_event_handler(int req_id, const char *pkg_type,
 				if (manager->event_cb)
 					manager->event_cb(pkg_type,
 							  pkg_name, event_type,
-							  PACAKGE_MANAGER_EVENT_STATE_FAILED,
+							  PACKAGE_MANAGER_EVENT_STATE_FAILED,
 							  0,
 							  PACKAGE_MANAGER_ERROR_NONE,
 							  manager->user_data);
@@ -785,3 +801,78 @@ int package_manager_compare_app_cert_info(const char *lhs_app_id, const char *rh
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
+int package_manager_is_preload_package_by_app_id(const char *app_id, bool *preload)
+{
+	pkgmgrinfo_appinfo_h pkgmgrinfo_appinfo = NULL;
+	pkgmgrinfo_pkginfo_h pkgmgrinfo_pkginfo = NULL;
+
+	int retval =0;
+	char *pkg_id = NULL;
+	bool is_preload = 0;
+
+	if (pkgmgrinfo_appinfo_get_appinfo(app_id, &pkgmgrinfo_appinfo) != PMINFO_R_OK)
+	{
+		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
+	}
+
+	retval = pkgmgrinfo_appinfo_get_pkgname(pkgmgrinfo_appinfo, &pkg_id);
+	if (retval != PMINFO_R_OK)
+	{
+		pkgmgrinfo_appinfo_destroy_appinfo(pkgmgrinfo_appinfo);
+		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
+	}
+
+	if (pkgmgrinfo_pkginfo_get_pkginfo(pkg_id, &pkgmgrinfo_pkginfo) != PMINFO_R_OK)
+	{
+		pkgmgrinfo_appinfo_destroy_appinfo(pkgmgrinfo_appinfo);
+		pkgmgrinfo_pkginfo_destroy_pkginfo(pkgmgrinfo_pkginfo);
+		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
+	}
+
+	if (pkgmgrinfo_pkginfo_is_preload(pkgmgrinfo_pkginfo, &is_preload) != PMINFO_R_OK)
+	{
+		pkgmgrinfo_appinfo_destroy_appinfo(pkgmgrinfo_appinfo);
+		pkgmgrinfo_pkginfo_destroy_pkginfo(pkgmgrinfo_pkginfo);
+		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
+	}
+
+	if (is_preload)
+		*preload = 1;
+	else
+		*preload = 0;
+
+	pkgmgrinfo_appinfo_destroy_appinfo(pkgmgrinfo_appinfo);
+	pkgmgrinfo_pkginfo_destroy_pkginfo(pkgmgrinfo_pkginfo);
+
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
+
+int package_manager_get_permission_type(const char *app_id, package_manager_permission_type_e *permission_type)
+{
+	int retval = 0;
+	pkgmgrinfo_appinfo_h pkgmgrinfo_appinfo =NULL;
+	pkgmgrinfo_permission_type permission = 0;
+
+	if (pkgmgrinfo_appinfo_get_appinfo(app_id, &pkgmgrinfo_appinfo) != PMINFO_R_OK)
+	{
+		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
+	}
+
+	retval = pkgmgrinfo_appinfo_get_permission_type(pkgmgrinfo_appinfo, &permission);
+	if (retval != PMINFO_R_OK)
+	{
+		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
+	}
+
+	if (permission == PMINFO_PERMISSION_NORMAL)
+		*permission_type = PACKAGE_MANAGER_PERMISSION_NORMAL;
+	else if (permission == PMINFO_PERMISSION_SIGNATURE)
+		*permission_type = PACKAGE_MANAGER_PERMISSION_SIGNATURE;
+	else if (permission == PMINFO_PERMISSION_PRIVILEGE)
+		*permission_type = PACKAGE_MANAGER_PERMISSION_PRIVILEGE;
+	else
+		*permission_type = PACKAGE_MANAGER_PERMISSION_NORMAL;
+
+	pkgmgrinfo_appinfo_destroy_appinfo(pkgmgrinfo_appinfo);
+	return PACKAGE_MANAGER_ERROR_NONE;
+}

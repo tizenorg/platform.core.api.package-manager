@@ -1,10 +1,9 @@
-#sbs-git:slp/api/package-manager capi-appfw-package-manager 0.1.0 76739af2bfbeb46dc9db0cb3e044f880ddcb9440
 Name:       capi-appfw-package-manager
 Summary:    Package Manager API
-Version: 0.0.22
+Version: 0.0.26
 Release:    1
-Group:      TO_BE/FILLED_IN
-License:    TO BE FILLED IN
+Group:      API
+License:    Apache-2.0
 Source0:    %{name}-%{version}.tar.gz
 BuildRequires:  cmake
 BuildRequires:  pkgconfig(dlog)
@@ -14,8 +13,6 @@ BuildRequires:  pkgconfig(ail)
 BuildRequires:	pkgconfig(vconf)
 BuildRequires:	pkgconfig(aul)
 BuildRequires:  pkgconfig(capi-base-common)
-Requires(post): /sbin/ldconfig
-Requires(postun): /sbin/ldconfig
 
 %description
 The Package Manager API provides functions to install, uninstall the package,
@@ -23,7 +20,7 @@ and also privides event listening function.
 
 %package devel
 Summary:  Package Manager API (Development)
-Group:    TO_BE/FILLED_IN
+Group:    API
 Requires: %{name} = %{version}-%{release}
 
 %description devel
@@ -37,7 +34,7 @@ and also privides event listening function. (DEV)
 
 %build
 MAJORVER=`echo %{version} | awk 'BEGIN {FS="."}{print $1}'`
-cmake . -DCMAKE_INSTALL_PREFIX=/usr -DFULLVER=%{version} -DMAJORVER=${MAJORVER}
+%cmake . -DFULLVER=%{version} -DMAJORVER=${MAJORVER}
 
 make %{?jobs:-j%jobs}
 

@@ -445,6 +445,25 @@ int package_info_is_removable_package(package_info_h package_info, bool *removab
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
+int package_info_is_preload_package(package_info_h package_info, bool *preload)
+{
+	bool pkg_info_value = false;
+
+	if (package_info == NULL || preload == NULL)
+	{
+		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
+	}
+
+	if (pkgmgr_pkginfo_is_preload(package_info->pkgmgr_pkginfo, &pkg_info_value) != PKGMGR_R_OK)
+	{
+		return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
+	}
+
+	*preload = pkg_info_value;
+
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
+
 int package_info_is_equal(package_info_h lhs, package_info_h rhs, bool *equal)
 {
 	if (lhs == NULL || rhs == NULL || equal == NULL)
