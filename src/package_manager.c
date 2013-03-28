@@ -257,7 +257,7 @@ static int package_manager_get_event_type(const char *key,
 		*event_type = PACKAGE_MANAGER_EVENT_TYPE_INSTALL;
 	else if (strcasecmp(key, "uninstall") == 0)
 		*event_type = PACKAGE_MANAGER_EVENT_TYPE_UNINSTALL;
-	else if (strcasecmp(key, "undate") == 0)
+	else if (strcasecmp(key, "update") == 0)
 		*event_type = PACKAGE_MANAGER_EVENT_TYPE_UPDATE;
 	else
 		return PACKAGE_MANAGER_ERROR_INVALID_PARAMETER;
