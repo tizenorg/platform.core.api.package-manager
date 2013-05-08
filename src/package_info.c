@@ -135,13 +135,17 @@ int package_info_foreach_package_info(package_manager_package_info_cb callback, 
 		.callback = callback,
 		.user_data = user_data,
 	};
+	int ret = 0;
 
 	if (callback == NULL)
 	{
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
 
-	pkgmgr_pkginfo_get_list(package_info_foreach_package_info_cb, &foreach_pkg_context);
+	ret = pkgmgr_pkginfo_get_list(package_info_foreach_package_info_cb, &foreach_pkg_context);
+	if (ret < 0) {
+		return PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE;
+	}
 
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
