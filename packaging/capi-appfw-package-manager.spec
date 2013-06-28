@@ -5,6 +5,7 @@ Release:    1
 Group:      API
 License:    Apache-2.0
 Source0:    %{name}-%{version}.tar.gz
+Source1001: 	capi-appfw-package-manager.manifest
 BuildRequires:  cmake
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(pkgmgr)
@@ -30,6 +31,7 @@ and also privides event listening function. (DEV)
 
 %prep
 %setup -q
+cp %{SOURCE1001} .
 
 
 %build
@@ -48,11 +50,12 @@ rm -rf %{buildroot}
 
 
 %files
-%manifest capi-appfw-package-manager.manifest
+%manifest %{name}.manifest
 %{_libdir}/libcapi-appfw-package-manager.so.*
 %{_bindir}/pkgmgr_tool
 
 %files devel
+%manifest %{name}.manifest
 %{_includedir}/appfw/package_manager.h
 %{_includedir}/appfw/package_info.h
 %{_libdir}/libcapi-appfw-package-manager.so
