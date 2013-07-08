@@ -1,0 +1,8 @@
+Change-Id: I8dcfc335645d209234d2ee478a231c79752231fc
+Code-Review+2: Ryan Ware <ware@linux.intel.com>
+Verified+1: Ryan Ware <ware@linux.intel.com>
+Submitted-by: Ryan Ware <ware@linux.intel.com>
+Submitted-at: Mon, 08 Jul 2013 10:06:39 -0700
+Reviewed-on: https://review.tizen.org/gerrit/4558
+Project: platform/core/api/package-manager
+Branch: refs/heads/tizen
