@@ -2,7 +2,7 @@ Name:       capi-appfw-package-manager
 Summary:    Package Manager API
 Version: 0.0.28
 Release:    1
-Group:      API
+Group:      System/API
 License:    Apache-2.0
 Source0:    %{name}-%{version}.tar.gz
 Source1001: 	capi-appfw-package-manager.manifest
@@ -21,7 +21,7 @@ and also privides event listening function.
 
 %package devel
 Summary:  Package Manager API (Development)
-Group:    API
+Group:    System/API
 Requires: %{name} = %{version}-%{release}
 
 %description devel
