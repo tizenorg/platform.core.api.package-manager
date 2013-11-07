@@ -1,0 +1,5 @@
+* Thu Nov 07 2013 Rusty Lynch <rusty.lynch@intel.com> accepted/tizen/20130912.195140@885afc7
+- Fix rpmlint error for Group name
+- Fix TIVI-2061 : package_manager_request_uninstall should use the mode set in the request
+- Create initial package changelog following the Tizen 3.0 development process
+
