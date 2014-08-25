@@ -34,7 +34,7 @@
 #endif
 
 #define LOG_TAG "CAPI_APPFW_PACKAGE_MANAGER"
-
+#define GLOBAL_USER 0
 
 struct package_info_s {
 	char *package;
@@ -62,17 +62,23 @@ static int package_info_create(const char *package,  package_info_h *package_inf
 {
 	package_info_h package_info_created;
 	pkgmgr_pkginfo_h pkgmgr_pkginfo;
+	uid_t uid = getuid();
 
 	if (package == NULL || package_info == NULL)
 	{
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
 
-	if (pkgmgr_pkginfo_get_pkginfo(package, &pkgmgr_pkginfo) != PKGMGR_R_OK)
+	if (uid != GLOBAL_USER)
 	{
-		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
+		if (pkgmgr_pkginfo_get_usr_pkginfo(package, uid, &pkgmgr_pkginfo) != PKGMGR_R_OK)
+			return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
 	}
-
+	else
+	{
+		if (pkgmgr_pkginfo_get_pkginfo(package, &pkgmgr_pkginfo) != PKGMGR_R_OK)
+			return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
+	}
 	package_info_created = calloc(1, sizeof(struct package_info_s));
 
 	if (package_info_created == NULL)
@@ -141,8 +147,11 @@ int package_info_foreach_package_info(package_manager_package_info_cb callback, 
 	{
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
-
-	ret = pkgmgr_pkginfo_get_list(package_info_foreach_package_info_cb, &foreach_pkg_context);
+	uid_t uid = getuid();
+	if (uid != GLOBAL_USER)
+		ret = pkgmgr_pkginfo_get_usr_list(package_info_foreach_package_info_cb, &foreach_pkg_context, uid);
+	else
+		ret = pkgmgr_pkginfo_get_list(package_info_foreach_package_info_cb, &foreach_pkg_context);
 	if (ret < 0) {
 		return PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE;
 	}
