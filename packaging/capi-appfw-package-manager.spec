@@ -14,6 +14,7 @@ BuildRequires:  pkgconfig(ail)
 BuildRequires:	pkgconfig(vconf)
 BuildRequires:	pkgconfig(aul)
 BuildRequires:  pkgconfig(capi-base-common)
+BuildRequires:  pkgconfig(libtzplatform-config)
 
 %description
 The Package Manager API provides functions to install, uninstall the package,

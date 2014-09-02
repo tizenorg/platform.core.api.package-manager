@@ -23,6 +23,7 @@
 #include <package-manager.h>
 #include <pkgmgr-info.h>
 #include <dlog.h>
+#include <tzplatform_config.h>
 
 #include <package_info.h>
 #include <package_manager.h>
@@ -34,7 +35,7 @@
 #endif
 
 #define LOG_TAG "CAPI_APPFW_PACKAGE_MANAGER"
-#define GLOBAL_USER 0
+#define GLOBAL_USER tzplatform_getuid(TZ_SYS_GLOBALAPP_USER)
 
 struct package_info_s {
 	char *package;
