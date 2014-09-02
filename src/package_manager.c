@@ -23,6 +23,7 @@
 #include <package_manager.h>
 #include <package_manager_private.h>
 #include <pkgmgr-info.h>
+#include <tzplatform_config.h>
 
 
 #ifdef LOG_TAG
@@ -34,7 +35,7 @@
 #define _LOGE(fmt, arg...) LOGE(fmt,##arg)
 #define _LOGD(fmt, arg...) LOGD(fmt, ##arg)
 
-#define GLOBAL_USER 0
+#define GLOBAL_USER tzplatform_getuid(TZ_SYS_GLOBALAPP_USER)
 typedef struct _event_info {
 	int req_id;
 	package_manager_event_type_e event_type;
