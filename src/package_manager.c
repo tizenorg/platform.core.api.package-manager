@@ -134,6 +134,7 @@ int package_manager_request_create(package_manager_request_h * request)
 	}
 
 	package_manager_request->ctype = PC_REQUEST;
+	package_manager_request->mode = PM_QUIET;
 	package_manager_request->pc = pkgmgr_client_new(PC_REQUEST);
 	if (package_manager_request->pc == NULL) {
 		free(package_manager_request);
