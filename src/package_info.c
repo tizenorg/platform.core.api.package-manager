@@ -197,13 +197,14 @@ int package_info_foreach_app_from_package(package_info_h package_info, package_i
 		.user_data = user_data,
 	};
 	pkgmgr_pkginfo_h pkgmgr_pkginfo;
+	uid_t uid = getuid();
 
 	if (package_info == NULL || callback == NULL)
 	{
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
 
-	if (pkgmgr_pkginfo_get_pkginfo(package_info->package, &pkgmgr_pkginfo) != PKGMGR_R_OK)
+	if (pkgmgr_pkginfo_get_usr_pkginfo(package_info->package,uid,&pkgmgr_pkginfo) != PKGMGR_R_OK)
 	{
 		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
 	}
