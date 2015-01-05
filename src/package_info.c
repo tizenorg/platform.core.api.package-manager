@@ -59,7 +59,7 @@ typedef struct _foreach_app_context_{
 } foreach_app_context_s;
 
 
-static int package_info_create(const char *package,  package_info_h *package_info)
+int package_info_create(const char *package, package_info_h *package_info)
 {
 	package_info_h package_info_created;
 	pkgmgr_pkginfo_h pkgmgr_pkginfo;
@@ -401,6 +401,37 @@ int package_info_get_installed_storage(package_info_h package_info, package_info
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
+int package_info_get_root_path(package_info_h package_info, char **path)
+{
+        char *pkg_info_value = NULL;
+        char *path_dup = NULL;
+
+        if (package_info == NULL || path == NULL)
+        {
+                return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
+        }
+
+        if (pkgmgrinfo_pkginfo_get_root_path(package_info->pkgmgr_pkginfo, &pkg_info_value) != PKGMGR_R_OK)
+        {
+                return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
+        }
+
+        if(!pkg_info_value)
+                goto END;
+
+        path_dup = strdup(pkg_info_value);
+
+        if (path_dup == NULL)
+        {
+                return package_manager_error(PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY, __FUNCTION__, NULL);
+        }
+
+END:
+        *path = path_dup;
+
+        return PACKAGE_MANAGER_ERROR_NONE;
+}
+
 /*
 int package_info_get_install_location(package_info_h package_info, package_manager_package_location_e *location)
 {
@@ -584,3 +615,16 @@ int package_info_foreach_cert_info(package_info_h package_info, package_info_cer
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
+int package_info_foreach_privilege_info(package_info_h package_info, package_info_privilege_info_cb callback, void *user_data)
+{
+        int ret = 0;
+
+        if (package_info == NULL || callback == NULL)
+        {
+                return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
+        }
+
+        ret = pkgmgrinfo_pkginfo_foreach_privilege(package_info->pkgmgr_pkginfo, callback, user_data);
+
+        return ret;
+}
