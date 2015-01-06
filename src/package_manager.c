@@ -150,7 +150,7 @@ int package_manager_request_create(package_manager_request_h * request)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-static int package_manager_client_valiate_handle(package_manager_request_h
+static int package_manager_client_validate_handle(package_manager_request_h
 						 request)
 {
 	if (request == NULL || request->pc == NULL) {
@@ -162,7 +162,7 @@ static int package_manager_client_valiate_handle(package_manager_request_h
 
 int package_manager_client_destroy(package_manager_request_h request)
 {
-	if (package_manager_client_valiate_handle(request)) {
+	if (package_manager_client_validate_handle(request)) {
 		return
 		    package_manager_error
 		    (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
@@ -178,7 +178,7 @@ int package_manager_client_destroy(package_manager_request_h request)
 
 int package_manager_request_destroy(package_manager_request_h request)
 {
-	if (package_manager_client_valiate_handle(request)) {
+	if (package_manager_client_validate_handle(request)) {
 		return
 		    package_manager_error
 		    (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
@@ -196,7 +196,7 @@ int package_manager_request_set_event_cb(package_manager_request_h request,
 					 package_manager_request_event_cb
 					 callback, void *user_data)
 {
-	if (package_manager_client_valiate_handle(request)) {
+	if (package_manager_client_validate_handle(request)) {
 		return
 		    package_manager_error
 		    (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
@@ -219,7 +219,7 @@ int package_manager_request_unset_event_cb(package_manager_request_h request)
 int package_manager_request_set_type(package_manager_request_h request,
 				     const char *pkg_type)
 {
-	if (package_manager_client_valiate_handle(request)) {
+	if (package_manager_client_validate_handle(request)) {
 		return
 		    package_manager_error
 		    (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
@@ -234,7 +234,7 @@ int package_manager_request_set_type(package_manager_request_h request,
 int package_manager_request_set_mode(package_manager_request_h request,
 				     package_manager_request_mode_e mode)
 {
-	if (package_manager_client_valiate_handle(request)) {
+	if (package_manager_client_validate_handle(request)) {
 		return
 		    package_manager_error
 		    (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
@@ -571,7 +571,7 @@ int package_manager_create(package_manager_h * manager)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-static int package_manager_valiate_handle(package_manager_h manager)
+static int package_manager_validate_handle(package_manager_h manager)
 {
 	if (manager == NULL || manager->pc == NULL) {
 		return PACKAGE_MANAGER_ERROR_INVALID_PARAMETER;
@@ -582,7 +582,7 @@ static int package_manager_valiate_handle(package_manager_h manager)
 
 int package_manager_destroy(package_manager_h manager)
 {
-	if (package_manager_valiate_handle(manager)) {
+	if (package_manager_validate_handle(manager)) {
 		return
 		    package_manager_error
 		    (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
@@ -752,7 +752,7 @@ int package_manager_set_event_cb(package_manager_h manager,
 				 package_manager_event_cb callback,
 				 void *user_data)
 {
-	if (package_manager_valiate_handle(manager)) {
+	if (package_manager_validate_handle(manager)) {
 		return
 		    package_manager_error
 		    (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
