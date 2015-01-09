@@ -574,6 +574,7 @@ int package_info_foreach_cert_info(package_info_h package_info, package_info_cer
 	pkgmgrinfo_certinfo_h handle = NULL;
 	int i = 0;
 	const char *cert_value = NULL;
+	uid_t uid = getuid();
 
 	if (package_info == NULL || callback == NULL)
 	{
@@ -584,7 +585,7 @@ int package_info_foreach_cert_info(package_info_h package_info, package_info_cer
 	if (retval != PMINFO_R_OK)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
 
-	retval = pkgmgrinfo_pkginfo_load_certinfo(package_info->package, handle);
+	retval = pkgmgrinfo_pkginfo_load_certinfo(package_info->package, handle, uid);
 	if (retval != PMINFO_R_OK)
 	{
 		pkgmgrinfo_pkginfo_destroy_certinfo(handle);
