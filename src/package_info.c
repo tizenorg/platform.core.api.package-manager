@@ -160,6 +160,26 @@ int package_info_foreach_package_info(package_manager_package_info_cb callback, 
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
+int package_info_filter_foreach_package_info(pkgmgrinfo_pkginfo_filter_h handle, package_manager_package_info_cb callback, void *user_data)
+{
+	foreach_pkg_context_s foreach_pkg_context = {
+		.callback = callback,
+		.user_data = user_data,
+	};
+	int ret;
+
+	if ((handle == NULL) || (callback == NULL))
+	{
+		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
+	}
+
+	ret = pkgmgrinfo_pkginfo_filter_foreach_pkginfo(handle, package_info_foreach_package_info_cb, &foreach_pkg_context);
+	if (ret < 0) {
+		return PACKAGE_MANAGER_ERROR_IO_ERROR;
+	}
+
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
 
 static int package_info_foreach_app_cb (const pkgmgr_appinfo_h handle, void *user_data)
 {
