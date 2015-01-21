@@ -25,9 +25,9 @@
 #include <dlog.h>
 #include <tzplatform_config.h>
 
-#include <package_info.h>
-#include <package_manager.h>
-#include "package_manager_private.h"
+#include "package_info.h"
+#include "package_manager.h"
+#include "package_manager_internal.h"
 
 
 #ifdef LOG_TAG
