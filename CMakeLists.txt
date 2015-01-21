@@ -47,7 +47,7 @@ INSTALL(TARGETS ${fw_name} DESTINATION ${LIB_INSTALL_DIR})
 INSTALL(
         DIRECTORY ${INC_DIR}/ DESTINATION include/appfw
         FILES_MATCHING
-        PATTERN "*_private.h" EXCLUDE
+        PATTERN "*_internal.h" EXCLUDE
         PATTERN "${INC_DIR}/*.h"
         )
 

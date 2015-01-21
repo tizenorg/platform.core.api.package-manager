@@ -21,11 +21,11 @@
 #include <unistd.h>
 
 #include <package-manager.h>
-#include <package_manager.h>
-#include <package_manager_private.h>
 #include <pkgmgr-info.h>
 #include <tzplatform_config.h>
 
+#include "package_manager.h"
+#include "package_manager_internal.h"
 
 #ifdef LOG_TAG
 #undef LOG_TAG

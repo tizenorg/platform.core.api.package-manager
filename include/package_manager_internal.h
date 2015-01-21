@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-#ifndef __TIZEN_APPFW_PACKAGE_MANAGER_PRIVATE_H__
-#define __TIZEN_APPFW_PACKAGE_MANAGER_PRIVATE_H__
+#ifndef __TIZEN_APPFW_PACKAGE_MANAGER_INTERNAL_H__
+#define __TIZEN_APPFW_PACKAGE_MANAGER_INTERNAL_H__
 
-#include <package_manager.h>
+#include "package_manager.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,4 +34,4 @@ int package_info_foreach_package_info(package_manager_package_info_cb callback,	
 }
 #endif
 
-#endif /* __TIZEN_APPFW_PACKAGE_MANAGER_PRIVATE_H__ */
+#endif /* __TIZEN_APPFW_PACKAGE_MANAGER_INTERNAL_H__ */
