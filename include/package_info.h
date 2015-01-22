@@ -431,7 +431,7 @@ int package_info_create(const char *package, package_info_h *package_info);
  * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY     Out of memory
  * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR          I/O error
  */
-int package_info_foreach_cert_info(package_info_h package_info, package_info_cert_info_cb callback, void* user_data);
+int package_info_foreach_cert_info(package_info_h package_info, package_info_cert_info_cb callback, void *user_data);
 
 /**
  * @brief Retrieves privilege information of the package.
@@ -449,7 +449,7 @@ int package_info_foreach_cert_info(package_info_h package_info, package_info_cer
  * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY     Out of memory
  * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR          I/O error
  */
-int package_info_foreach_privilege_info(package_info_h package_info, package_info_privilege_info_cb callback, void* user_data);
+int package_info_foreach_privilege_info(package_info_h package_info, package_info_privilege_info_cb callback, void *user_data);
 
 /**
 * @}

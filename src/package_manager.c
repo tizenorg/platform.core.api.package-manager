@@ -123,7 +123,7 @@ int package_manager_error(package_manager_error_e error,
 	return error;
 }
 
-int package_manager_request_create(package_manager_request_h * request)
+API int package_manager_request_create(package_manager_request_h *request)
 {
 	struct package_manager_request_s *package_manager_request;
 
@@ -186,7 +186,7 @@ int package_manager_client_destroy(package_manager_request_h request)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_request_destroy(package_manager_request_h request)
+API int package_manager_request_destroy(package_manager_request_h request)
 {
 	if (package_manager_client_validate_handle(request)) {
 		return
@@ -202,7 +202,7 @@ int package_manager_request_destroy(package_manager_request_h request)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_request_set_event_cb(package_manager_request_h request,
+API int package_manager_request_set_event_cb(package_manager_request_h request,
 					 package_manager_request_event_cb
 					 callback, void *user_data)
 {
@@ -219,7 +219,7 @@ int package_manager_request_set_event_cb(package_manager_request_h request,
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_request_unset_event_cb(package_manager_request_h request)
+API int package_manager_request_unset_event_cb(package_manager_request_h request)
 {
 	// TODO: Please implement this function.
 	if (package_manager_client_validate_handle(request)) {
@@ -230,7 +230,7 @@ int package_manager_request_unset_event_cb(package_manager_request_h request)
 }
 
 
-int package_manager_request_set_type(package_manager_request_h request,
+API int package_manager_request_set_type(package_manager_request_h request,
 				     const char *pkg_type)
 {
 	if (package_manager_client_validate_handle(request)) {
@@ -245,7 +245,7 @@ int package_manager_request_set_type(package_manager_request_h request,
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_request_set_mode(package_manager_request_h request,
+API int package_manager_request_set_mode(package_manager_request_h request,
 				     package_manager_request_mode_e mode)
 {
 	if (package_manager_client_validate_handle(request)) {
@@ -485,7 +485,7 @@ static int request_event_handler(int req_id, const char *pkg_type,
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_request_install(package_manager_request_h request,
+API int package_manager_request_install(package_manager_request_h request,
 				    const char *path, int *id)
 {
 	if (package_manager_client_validate_handle(request)) {
@@ -531,7 +531,7 @@ int package_manager_request_install(package_manager_request_h request,
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_request_uninstall(package_manager_request_h request,
+API int package_manager_request_uninstall(package_manager_request_h request,
 				      const char *name, int *id)
 {
 	if (package_manager_client_validate_handle(request)) {
@@ -574,7 +574,7 @@ int package_manager_request_uninstall(package_manager_request_h request,
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_request_move(package_manager_request_h request,
+API int package_manager_request_move(package_manager_request_h request,
 				    const char *name, package_manager_move_type_e move_type)
 {
 	if (package_manager_client_validate_handle(request)) {
@@ -612,7 +612,8 @@ int package_manager_request_move(package_manager_request_h request,
 
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
-int package_manager_create(package_manager_h * manager)
+
+API int package_manager_create(package_manager_h * manager)
 {
 	struct package_manager_s *package_manager = NULL;
 
@@ -657,7 +658,7 @@ static int package_manager_validate_handle(package_manager_h manager)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_destroy(package_manager_h manager)
+API int package_manager_destroy(package_manager_h manager)
 {
 	if (package_manager_validate_handle(manager)) {
 		return
@@ -825,7 +826,7 @@ static int global_event_handler(int req_id, const char *pkg_type,
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_set_event_status(package_manager_h manager, int status_type)
+API int package_manager_set_event_status(package_manager_h manager, int status_type)
 {
 	int retval;
 
@@ -842,7 +843,7 @@ int package_manager_set_event_status(package_manager_h manager, int status_type)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_set_event_cb(package_manager_h manager,
+API int package_manager_set_event_cb(package_manager_h manager,
 				 package_manager_event_cb callback,
 				 void *user_data)
 {
@@ -861,13 +862,13 @@ int package_manager_set_event_cb(package_manager_h manager,
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_unset_event_cb(package_manager_h manager)
+API int package_manager_unset_event_cb(package_manager_h manager)
 {
 	// TODO: Please implement this function.
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_get_package_id_by_app_id(const char *app_id, char **package_id)
+API int package_manager_get_package_id_by_app_id(const char *app_id, char **package_id)
 {
 	pkgmgrinfo_appinfo_h pkgmgrinfo_appinfo;
 	int retval;
@@ -904,7 +905,7 @@ int package_manager_get_package_id_by_app_id(const char *app_id, char **package_
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_get_package_info(const char *package_id, package_info_h *package_info)
+API int package_manager_get_package_info(const char *package_id, package_info_h *package_info)
 {
 	int retval;
 
@@ -916,7 +917,7 @@ int package_manager_get_package_info(const char *package_id, package_info_h *pac
 		return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_foreach_package_info(package_manager_package_info_cb callback,
+API int package_manager_foreach_package_info(package_manager_package_info_cb callback,
 					void *user_data)
 {
 	int retval;
@@ -930,7 +931,8 @@ int package_manager_foreach_package_info(package_manager_package_info_cb callbac
 		return PACKAGE_MANAGER_ERROR_NONE;
 	}
 }
-int package_manager_compare_package_cert_info(const char *lhs_package_id, const char *rhs_package_id, package_manager_compare_result_type_e *compare_result)
+
+API int package_manager_compare_package_cert_info(const char *lhs_package_id, const char *rhs_package_id, package_manager_compare_result_type_e *compare_result)
 {
 	pkgmgrinfo_cert_compare_result_type_e result;
   uid_t uid = getuid();
@@ -951,7 +953,7 @@ int package_manager_compare_package_cert_info(const char *lhs_package_id, const 
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_compare_app_cert_info(const char *lhs_app_id, const char *rhs_app_id, package_manager_compare_result_type_e *compare_result)
+API int package_manager_compare_app_cert_info(const char *lhs_app_id, const char *rhs_app_id, package_manager_compare_result_type_e *compare_result)
 {
 	pkgmgrinfo_cert_compare_result_type_e result;
 	uid_t uid = getuid();
@@ -973,7 +975,7 @@ int package_manager_compare_app_cert_info(const char *lhs_app_id, const char *rh
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_is_preload_package_by_app_id(const char *app_id, bool *preload)
+API int package_manager_is_preload_package_by_app_id(const char *app_id, bool *preload)
 {
 	pkgmgrinfo_appinfo_h pkgmgrinfo_appinfo = NULL;
 	pkgmgrinfo_pkginfo_h pkgmgrinfo_pkginfo = NULL;
@@ -1032,7 +1034,7 @@ int package_manager_is_preload_package_by_app_id(const char *app_id, bool *prelo
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_get_permission_type(const char *app_id, package_manager_permission_type_e *permission_type)
+API int package_manager_get_permission_type(const char *app_id, package_manager_permission_type_e *permission_type)
 {
 	int retval = 0;
 	pkgmgrinfo_appinfo_h pkgmgrinfo_appinfo =NULL;
@@ -1063,7 +1065,7 @@ int package_manager_get_permission_type(const char *app_id, package_manager_perm
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_clear_cache_dir(const char *package_id)
+API int package_manager_clear_cache_dir(const char *package_id)
 {
 	int res = pkgmgr_client_clear_cache_dir(package_id);
 	if (res == PKGMGR_R_EINVAL)
@@ -1099,7 +1101,7 @@ int package_manager_clear_cache_dir(const char *package_id)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_clear_all_cache_dir(void)
+API int package_manager_clear_all_cache_dir(void)
 {
 	return package_manager_clear_cache_dir(PKG_CLEAR_ALL_CACHE);
 }
@@ -1155,7 +1157,7 @@ static void __total_result_cb(pkgmgr_client *pc, const pkg_size_info_t *result, 
 	g_hash_table_remove(__cb_table, pc);
 }
 
-int package_manager_get_package_size_info(const char *package_id, package_manager_size_info_receive_cb callback, void *user_data)
+API int package_manager_get_package_size_info(const char *package_id, package_manager_size_info_receive_cb callback, void *user_data)
 {
 	if (package_id == NULL || callback == NULL)
 	{
@@ -1226,12 +1228,12 @@ int package_manager_get_package_size_info(const char *package_id, package_manage
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_get_total_package_size_info(package_manager_total_size_info_receive_cb callback, void *user_data)
+API int package_manager_get_total_package_size_info(package_manager_total_size_info_receive_cb callback, void *user_data)
 {
 	return package_manager_get_package_size_info(PKG_SIZE_INFO_TOTAL, callback, user_data);
 }
 
-int package_manager_filter_create(package_manager_filter_h *handle)
+API int package_manager_filter_create(package_manager_filter_h *handle)
 {
 	int retval;
 	pkgmgrinfo_pkginfo_filter_h pkgmgr_filter = NULL;
@@ -1255,7 +1257,7 @@ int package_manager_filter_create(package_manager_filter_h *handle)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_filter_destroy(package_manager_filter_h handle)
+API int package_manager_filter_destroy(package_manager_filter_h handle)
 {
 	int retval;
 
@@ -1275,7 +1277,8 @@ int package_manager_filter_destroy(package_manager_filter_h handle)
 
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
-int package_manager_filter_add_bool(package_manager_filter_h handle,
+
+API int package_manager_filter_add_bool(package_manager_filter_h handle,
 		const char *property, const bool value)
 {
 	int retval;
@@ -1297,7 +1300,7 @@ int package_manager_filter_add_bool(package_manager_filter_h handle,
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_filter_count(package_manager_filter_h handle, int *count)
+API int package_manager_filter_count(package_manager_filter_h handle, int *count)
 {
 	int retval = 0;
 
@@ -1315,7 +1318,7 @@ int package_manager_filter_count(package_manager_filter_h handle, int *count)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_filter_foreach_package_info(package_manager_filter_h handle,
+API int package_manager_filter_foreach_package_info(package_manager_filter_h handle,
 		package_manager_package_info_cb callback, void *user_data)
 {
 	int retval;
