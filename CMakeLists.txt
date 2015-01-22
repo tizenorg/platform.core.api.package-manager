@@ -19,7 +19,7 @@ FOREACH(flag ${${fw_name}_CFLAGS})
     SET(EXTRA_CFLAGS "${EXTRA_CFLAGS} ${flag}")
 ENDFOREACH(flag)
 
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_CFLAGS} -fPIC -Wall")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_CFLAGS} -fPIC -Wall -fvisibility=hidden")
 SET(CMAKE_C_FLAGS_DEBUG "-O0 -g")
 
 IF("${ARCH}" STREQUAL "arm")
@@ -44,12 +44,7 @@ SET_TARGET_PROPERTIES(${fw_name}
 )
 
 INSTALL(TARGETS ${fw_name} DESTINATION ${LIB_INSTALL_DIR})
-INSTALL(
-        DIRECTORY ${INC_DIR}/ DESTINATION include/appfw
-        FILES_MATCHING
-        PATTERN "*_internal.h" EXCLUDE
-        PATTERN "${INC_DIR}/*.h"
-        )
+INSTALL(DIRECTORY ${INC_DIR}/ DESTINATION include/appfw)
 
 SET(PC_NAME ${fw_name})
 SET(PC_REQUIRED ${pc_requires})

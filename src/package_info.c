@@ -22,19 +22,12 @@
 
 #include <package-manager.h>
 #include <pkgmgr-info.h>
-#include <dlog.h>
 #include <tzplatform_config.h>
 
 #include "package_info.h"
 #include "package_manager.h"
 #include "package_manager_internal.h"
 
-
-#ifdef LOG_TAG
-#undef LOG_TAG
-#endif
-
-#define LOG_TAG "CAPI_APPFW_PACKAGE_MANAGER"
 #define GLOBAL_USER tzplatform_getuid(TZ_SYS_GLOBALAPP_USER)
 
 struct package_info_s {
@@ -47,19 +40,12 @@ struct package_cert_info_s {
 	pkgmgrinfo_certinfo_h pkgmgrinfo_certinfo;
 };
 
-typedef struct _foreach_pkg_context_{
-	package_manager_package_info_cb callback;
-	void *user_data;
-} foreach_pkg_context_s;
-
-
 typedef struct _foreach_app_context_{
 	package_info_app_cb callback;
 	void *user_data;
 } foreach_app_context_s;
 
-
-int package_info_create(const char *package, package_info_h *package_info)
+API int package_info_create(const char *package, package_info_h *package_info)
 {
 	package_info_h package_info_created;
 	pkgmgr_pkginfo_h pkgmgr_pkginfo;
@@ -104,86 +90,6 @@ int package_info_create(const char *package, package_info_h *package_info)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-
-int package_info_get_package_info(const char *package, package_info_h *package_info)
-{
-	return package_info_create(package, package_info);
-}
-
-
-static int package_info_foreach_package_info_cb(const pkgmgr_pkginfo_h handle, void *user_data)
-{
-	char *pkg_name = NULL;
-	foreach_pkg_context_s *foreach_pkg_context = user_data;
-	package_info_h package_info = NULL;
-
-	if (handle == NULL || foreach_pkg_context == NULL)
-	{
-		package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
-		return PKGMGR_R_EINVAL;
-	}
-
-	pkgmgr_pkginfo_get_pkgname(handle, &pkg_name);
-
-	if (package_info_create(pkg_name, &package_info) == PACKAGE_MANAGER_ERROR_NONE)
-	{
-		foreach_pkg_context->callback(package_info, foreach_pkg_context->user_data);
-		package_info_destroy(package_info);
-	}
-
-	/* pkgmgr_get_info_list() needs to be enhanced to stop and continue callback */
-	return PKGMGR_R_OK;
-}
-
-
-int package_info_foreach_package_info(package_manager_package_info_cb callback, void *user_data)
-{
-	foreach_pkg_context_s foreach_pkg_context = {
-		.callback = callback,
-		.user_data = user_data,
-	};
-	int ret = 0;
-
-	if (callback == NULL)
-	{
-		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
-	}
-	uid_t uid = getuid();
-	if (uid != GLOBAL_USER)
-		ret = pkgmgr_pkginfo_get_usr_list(package_info_foreach_package_info_cb, &foreach_pkg_context, uid);
-	else
-		ret = pkgmgr_pkginfo_get_list(package_info_foreach_package_info_cb, &foreach_pkg_context);
-	if (ret < 0) {
-		return PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE;
-	}
-
-	return PACKAGE_MANAGER_ERROR_NONE;
-}
-
-int package_info_filter_foreach_package_info(pkgmgrinfo_pkginfo_filter_h handle, package_manager_package_info_cb callback, void *user_data)
-{
-	foreach_pkg_context_s foreach_pkg_context = {
-		.callback = callback,
-		.user_data = user_data,
-	};
-	int ret;
-	uid_t uid;
-
-	if ((handle == NULL) || (callback == NULL))
-		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
-
-	uid = getuid();
-	if (uid != GLOBAL_USER)
-		ret = pkgmgrinfo_pkginfo_usr_filter_foreach_pkginfo(handle, package_info_foreach_package_info_cb, &foreach_pkg_context, uid);
-	else
-		ret = pkgmgrinfo_pkginfo_filter_foreach_pkginfo(handle, package_info_foreach_package_info_cb, &foreach_pkg_context);
-
-	if (ret < 0)
-		return PACKAGE_MANAGER_ERROR_IO_ERROR;
-
-	return PACKAGE_MANAGER_ERROR_NONE;
-}
-
 static int package_info_foreach_app_cb (const pkgmgr_appinfo_h handle, void *user_data)
 {
 	char *appid = NULL;
@@ -211,9 +117,7 @@ static int package_info_foreach_app_cb (const pkgmgr_appinfo_h handle, void *use
 	return PKGMGR_R_OK;
 }
 
-
-
-int package_info_foreach_app_from_package(package_info_h package_info, package_info_app_component_type_e comp_type, package_info_app_cb callback, void *user_data)
+API int package_info_foreach_app_from_package(package_info_h package_info, package_info_app_component_type_e comp_type, package_info_app_cb callback, void *user_data)
 {
 	foreach_app_context_s foreach_app_context = {
 		.callback = callback,
@@ -240,8 +144,7 @@ int package_info_foreach_app_from_package(package_info_h package_info, package_i
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-
-int package_info_destroy(package_info_h package_info)
+API int package_info_destroy(package_info_h package_info)
 {
 	if (package_info == NULL)
 	{
@@ -257,7 +160,7 @@ int package_info_destroy(package_info_h package_info)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_info_get_package(package_info_h package_info, char **package)
+API int package_info_get_package(package_info_h package_info, char **package)
 {
 	char *package_dup;
 
@@ -278,7 +181,7 @@ int package_info_get_package(package_info_h package_info, char **package)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_info_get_label(package_info_h package_info, char **label)
+API int package_info_get_label(package_info_h package_info, char **label)
 {
 	char *pkg_info_value = NULL;
 	char *label_dup = NULL;
@@ -309,7 +212,7 @@ END:
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_info_get_icon(package_info_h package_info, char **path)
+API int package_info_get_icon(package_info_h package_info, char **path)
 {
 	char *pkg_info_value = NULL;
 	char *icon_dup = NULL;
@@ -340,7 +243,7 @@ END:
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_info_get_version(package_info_h package_info, char **version)
+API int package_info_get_version(package_info_h package_info, char **version)
 {
 	char *pkg_info_value = NULL;
 	char *ver_dup = NULL;
@@ -371,7 +274,7 @@ END:
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_info_get_type(package_info_h package_info, char **type)
+API int package_info_get_type(package_info_h package_info, char **type)
 {
 	char *pkg_info_value = NULL;
 	char *type_dup = NULL;
@@ -402,7 +305,7 @@ END:
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_info_get_installed_storage(package_info_h package_info, package_info_installed_storage_type_e *storage)
+API int package_info_get_installed_storage(package_info_h package_info, package_info_installed_storage_type_e *storage)
 {
 	int ret = 0;
 	pkgmgr_installed_storage pkg_info_value;
@@ -424,7 +327,7 @@ int package_info_get_installed_storage(package_info_h package_info, package_info
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_info_get_root_path(package_info_h package_info, char **path)
+API int package_info_get_root_path(package_info_h package_info, char **path)
 {
         char *pkg_info_value = NULL;
         char *path_dup = NULL;
@@ -455,28 +358,7 @@ END:
         return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-/*
-int package_info_get_install_location(package_info_h package_info, package_manager_package_location_e *location)
-{
-	pkgmgr_install_location pkg_info_value = 0;
-
-	if (package_info == NULL || system == NULL)
-	{
-		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
-	}
-
-	if (pkgmgr_pkginfo_get_install_location(package_info->pkgmgr_pkginfo, &pkg_info_value) != PKGMGR_R_OK)
-	{
-		return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
-	}
-
-	*location = (pkg_info_value==PM_INSTALL_LOCATION_INTERNAL_ONLY ? PACAKGE_MANAGER_LOCATION_INTERNAL : PACAKGE_MANAGER_LOCATION_EXTERNAL);
-
-	return PACKAGE_MANAGER_ERROR_NONE;
-}
-*/
-
-int package_info_is_system_package(package_info_h package_info, bool *system)
+API int package_info_is_system_package(package_info_h package_info, bool *system)
 {
 	bool pkg_info_value = false;
 
@@ -495,7 +377,7 @@ int package_info_is_system_package(package_info_h package_info, bool *system)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_info_is_removable_package(package_info_h package_info, bool *removable)
+API int package_info_is_removable_package(package_info_h package_info, bool *removable)
 {
 	bool pkg_info_value = false;
 
@@ -514,7 +396,7 @@ int package_info_is_removable_package(package_info_h package_info, bool *removab
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_info_is_preload_package(package_info_h package_info, bool *preload)
+API int package_info_is_preload_package(package_info_h package_info, bool *preload)
 {
 	bool pkg_info_value = false;
 
@@ -533,7 +415,7 @@ int package_info_is_preload_package(package_info_h package_info, bool *preload)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_info_is_equal(package_info_h lhs, package_info_h rhs, bool *equal)
+API int package_info_is_equal(package_info_h lhs, package_info_h rhs, bool *equal)
 {
 	if (lhs == NULL || rhs == NULL || equal == NULL)
 	{
@@ -552,7 +434,7 @@ int package_info_is_equal(package_info_h lhs, package_info_h rhs, bool *equal)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_info_is_accessible(package_info_h package_info, bool *accessible)
+API int package_info_is_accessible(package_info_h package_info, bool *accessible)
 {
 	int ret = 0;
 	bool pkg_info_value = false;
@@ -572,7 +454,7 @@ int package_info_is_accessible(package_info_h package_info, bool *accessible)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_info_clone(package_info_h *clone, package_info_h package_info)
+API int package_info_clone(package_info_h *clone, package_info_h package_info)
 {
 	int retval;
 
@@ -591,7 +473,7 @@ int package_info_clone(package_info_h *clone, package_info_h package_info)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_info_foreach_cert_info(package_info_h package_info, package_info_cert_info_cb callback, void* user_data)
+API int package_info_foreach_cert_info(package_info_h package_info, package_info_cert_info_cb callback, void *user_data)
 {
 	int retval;
 	pkgmgrinfo_certinfo_h handle = NULL;
@@ -639,7 +521,7 @@ int package_info_foreach_cert_info(package_info_h package_info, package_info_cer
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_info_foreach_privilege_info(package_info_h package_info, package_info_privilege_info_cb callback, void *user_data)
+API int package_info_foreach_privilege_info(package_info_h package_info, package_info_privilege_info_cb callback, void *user_data)
 {
         int ret = 0;
 
