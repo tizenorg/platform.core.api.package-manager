@@ -625,7 +625,7 @@ int package_manager_compare_package_cert_info(const char *lhs_package_id, const 
  * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY     Out of memory
  * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR          Database error occurred
  */
- int package_manager_compare_app_cert_info(const char *lhs_app_id, const char *rhs_app_id, package_manager_compare_result_type_e *compare_result);
+int package_manager_compare_app_cert_info(const char *lhs_app_id, const char *rhs_app_id, package_manager_compare_result_type_e *compare_result);
 
 /**
  * @brief Checks whether the package is preloaded by @a app_id.

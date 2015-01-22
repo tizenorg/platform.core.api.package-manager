@@ -17,7 +17,21 @@
 #ifndef __TIZEN_APPFW_PACKAGE_MANAGER_INTERNAL_H__
 #define __TIZEN_APPFW_PACKAGE_MANAGER_INTERNAL_H__
 
+#include <dlog.h>
 #include "package_manager.h"
+
+#ifndef API
+#define API __attribute__ ((visibility("default")))
+#endif
+
+#ifdef LOG_TAG
+#undef LOG_TAG
+#endif
+
+#define LOG_TAG "CAPI_APPFW_PACKAGE_MANAGER"
+
+#define _LOGE(fmt, arg...) LOGE(fmt,##arg)
+#define _LOGD(fmt, arg...) LOGD(fmt, ##arg)
 
 #ifdef __cplusplus
 extern "C" {
@@ -29,6 +43,7 @@ int package_info_get_package_info(const char *package, package_info_h *package_i
 
 int package_info_foreach_package_info(package_manager_package_info_cb callback,	void *user_data);
 
+int package_info_filter_foreach_package_info(pkgmgrinfo_pkginfo_filter_h handle, package_manager_package_info_cb callback, void *user_data);
 
 #ifdef __cplusplus
 }
