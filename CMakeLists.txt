@@ -1,93 +1,48 @@
-
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-SET(fw_name "capi-appfw-package-manager")
-
-PROJECT(${fw_name})
-
 SET(CMAKE_INSTALL_PREFIX /usr)
 SET(PREFIX ${CMAKE_INSTALL_PREFIX})
+
+SET(PACKAGE_MANAGER "capi-appfw-package-manager")
+PROJECT(${PACKAGE_MANAGER})
+SET(SOURCES src/package_info.c
+	src/package_manager.c
+	src/package_manager_internal.c)
+
+INCLUDE(FindPkgConfig)
+pkg_check_modules(PKGS REQUIRED
+	capi-base-common
+	dlog
+	vconf
+	aul
+	ail
+	pkgmgr
+	pkgmgr-info
+	libtzplatform-config)
+FOREACH(FLAGS ${PKGS_CFLAGS})
+	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${FLAGS}")
+ENDFOREACH(FLAGS)
 
 SET(INC_DIR include)
 INCLUDE_DIRECTORIES(${INC_DIR})
 
-SET(requires "capi-base-common dlog vconf aul ail pkgmgr pkgmgr-info libtzplatform-config")
-SET(pc_requires "capi-base-common")
+ADD_LIBRARY(${PACKAGE_MANAGER} SHARED ${SOURCES})
+TARGET_LINK_LIBRARIES(${PACKAGE_MANAGER} ${PKGS_LDFLAGS})
 
-INCLUDE(FindPkgConfig)
-pkg_check_modules(${fw_name} REQUIRED ${requires})
-FOREACH(flag ${${fw_name}_CFLAGS})
-    SET(EXTRA_CFLAGS "${EXTRA_CFLAGS} ${flag}")
-ENDFOREACH(flag)
-
-SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_CFLAGS} -fPIC -Wall -fvisibility=hidden")
+SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fPIC -Wall -fvisibility=hidden")
 SET(CMAKE_C_FLAGS_DEBUG "-O0 -g")
 
-IF("${ARCH}" STREQUAL "arm")
-    ADD_DEFINITIONS("-DTARGET")
-ENDIF("${ARCH}" STREQUAL "arm")
+SET_TARGET_PROPERTIES(${PACKAGE_MANAGER} PROPERTIES VERSION ${FULLVER})
+SET_TARGET_PROPERTIES(${PACKAGE_MANAGER} PROPERTIES SOVERSION ${MAJORVER})
+SET_TARGET_PROPERTIES(${PACKAGE_MANAGER} PROPERTIES CLEAN_DIRECT_OUTPUT 1)
 
-ADD_DEFINITIONS("-DPREFIX=\"${CMAKE_INSTALL_PREFIX}\"")
-ADD_DEFINITIONS("-DSLP_DEBUG")
+SET(PC_NAME ${PACKAGE_MANAGER})
+SET(PC_REQUIRED "capi-base-common")
+SET(PC_LDFLAGS -l${PACKAGE_MANAGER})
+SET(PC_CFLAGS -I\${PREFIX}/include/appfw)
+CONFIGURE_FILE(capi-appfw-package-manager.pc.in ${CMAKE_CURRENT_SOURCE_DIR}/${PACKAGE_MANAGER}.pc @ONLY)
 
-SET(CMAKE_EXE_LINKER_FLAGS "-Wl,--as-needed -Wl,--rpath=${LIB_INSTALL_DIR}")
-
-aux_source_directory(src SOURCES)
-ADD_LIBRARY(${fw_name} SHARED ${SOURCES})
-
-TARGET_LINK_LIBRARIES(${fw_name} ${${fw_name}_LDFLAGS})
-
-SET_TARGET_PROPERTIES(${fw_name}
-     PROPERTIES
-     VERSION ${FULLVER}
-     SOVERSION ${MAJORVER}
-     CLEAN_DIRECT_OUTPUT 1
-)
-
-INSTALL(TARGETS ${fw_name} DESTINATION ${LIB_INSTALL_DIR})
+INSTALL(TARGETS ${PACKAGE_MANAGER} DESTINATION ${LIB_INSTALL_DIR})
 INSTALL(DIRECTORY ${INC_DIR}/ DESTINATION include/appfw)
+INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${PACKAGE_MANAGER}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
 
-SET(PC_NAME ${fw_name})
-SET(PC_REQUIRED ${pc_requires})
-SET(PC_LDFLAGS -l${fw_name})
-SET(PC_CFLAGS -I\${includedir}/appfw)
-
-CONFIGURE_FILE(
-    capi-appfw-package-manager.pc.in
-    ${CMAKE_CURRENT_SOURCE_DIR}/${fw_name}.pc
-    @ONLY
-)
-INSTALL(FILES ${CMAKE_CURRENT_SOURCE_DIR}/${fw_name}.pc DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
-
-
-IF(UNIX)
-
-ADD_CUSTOM_TARGET (distclean @echo cleaning for source distribution)
-ADD_CUSTOM_COMMAND(
-        DEPENDS clean
-        COMMENT "distribution clean"
-        COMMAND find
-        ARGS    .
-        -not -name config.cmake -and \(
-        -name tester.c -or
-        -name Testing -or
-        -name CMakeFiles -or
-        -name cmake.depends -or
-        -name cmake.check_depends -or
-        -name CMakeCache.txt -or
-        -name cmake.check_cache -or
-        -name *.cmake -or
-        -name Makefile -or
-        -name core -or
-        -name core.* -or
-        -name gmon.out -or
-        -name install_manifest.txt -or
-        -name *.pc -or
-        -name *~ \)
-        | grep -v TC | xargs rm -rf
-        TARGET  distclean
-        VERBATIM
-)
-
-ENDIF(UNIX)
-
-add_subdirectory(tool)
+ADD_SUBDIRECTORY(tool)
