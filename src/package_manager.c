@@ -43,6 +43,7 @@ struct package_manager_s {
 	pkgmgr_mode mode;
 	event_info *head;
 	package_manager_event_cb event_cb;
+	package_manager_global_event_cb global_event_cb;
 	void *user_data;
 };
 
@@ -331,7 +332,7 @@ static int __remove_event_info(event_info **head request, int req_id)
 }
 */
 
-static int request_event_handler(int req_id, const char *pkg_type,
+static int request_event_handler(uid_t target_uid, int req_id, const char *pkg_type,
 				 const char *pkg_name, const char *key,
 				 const char *val, const void *pmsg, void *data)
 {
@@ -672,7 +673,32 @@ static int __update_event(event_info ** head, int req_id,
 	return -1;
 }
 
-static int global_event_handler(int req_id, const char *pkg_type,
+/* App Event Listening Policy:
+ * +----------------+------------+---------------+------------------+
+ * |Listener \ Type |Global Event|My User's Event|Other user's Event|
+ * +----------------+------------+---------------+------------------+
+ * |User Process App|   Grant    |     Grant     |      Deny        |
+ * +----------------+------------+---------------+------------------+
+ * |Platform module |   Grant    |     Grant     |      Grant       |
+ * +----------------+------------+---------------+------------------+
+ * UID assignment policy:
+ * https://wiki.tizen.org/wiki/Security/User_and_group_ID_assignment_policy
+ */
+#define REGULAR_USER 5000
+static int __validate_event_signal(uid_t target_uid)
+{
+	uid_t self = getuid();
+
+	if (self == target_uid)
+		return 0;
+
+	if (self < REGULAR_USER)
+		return 0;
+
+	return -1;
+}
+
+static int global_event_handler(uid_t target_uid, int req_id, const char *pkg_type,
 				const char *pkg_name, const char *key,
 				const char *val, const void *pmsg, void *data)
 {
@@ -684,6 +710,9 @@ static int global_event_handler(int req_id, const char *pkg_type,
 
 	package_manager_h manager = data;
 
+	if (__validate_event_signal(target_uid))
+		return PACKAGE_MANAGER_ERROR_NONE;
+
 	if (strcasecmp(key, "start") == 0) {
 		ret = package_manager_get_event_type(val, &event_type);
 		if (ret != PACKAGE_MANAGER_ERROR_NONE)
@@ -692,8 +721,13 @@ static int global_event_handler(int req_id, const char *pkg_type,
 		__add_event(&(manager->head), req_id, event_type,
 				 PACKAGE_MANAGER_EVENT_STATE_STARTED);
 
-		if (manager->event_cb)
+		if (manager->event_cb && getuid() == target_uid)
 			manager->event_cb(pkg_type, pkg_name,
+					  event_type,
+					  PACKAGE_MANAGER_EVENT_STATE_STARTED,
+					  0, PACKAGE_MANAGER_ERROR_NONE, manager->user_data);
+		if (manager->global_event_cb)
+			manager->global_event_cb(target_uid, pkg_type, pkg_name,
 					  event_type,
 					  PACKAGE_MANAGER_EVENT_STATE_STARTED,
 					  0, PACKAGE_MANAGER_ERROR_NONE, manager->user_data);
@@ -706,8 +740,15 @@ static int global_event_handler(int req_id, const char *pkg_type,
 			__update_event(&(manager->head), req_id,
 					    event_type,
 					    PACKAGE_MANAGER_EVENT_STATE_PROCESSING);
-			if (manager->event_cb)
+			if (manager->event_cb && getuid() == target_uid)
 				manager->event_cb(pkg_type, pkg_name,
+						  event_type,
+						  PACKAGE_MANAGER_EVENT_STATE_PROCESSING,
+						  atoi(val),
+						  PACKAGE_MANAGER_ERROR_NONE,
+						  manager->user_data);
+			if (manager->global_event_cb)
+				manager->global_event_cb(target_uid, pkg_type, pkg_name,
 						  event_type,
 						  PACKAGE_MANAGER_EVENT_STATE_PROCESSING,
 						  atoi(val),
@@ -725,22 +766,35 @@ static int global_event_handler(int req_id, const char *pkg_type,
 						    PACKAGE_MANAGER_EVENT_STATE_FAILED);
 			}
 
-			if (manager->event_cb)
+			if (manager->event_cb && getuid() == target_uid)
 				manager->event_cb(pkg_type,
 						  pkg_name, event_type,
 						  PACKAGE_MANAGER_EVENT_STATE_FAILED,
 						  0,
 						  PACKAGE_MANAGER_ERROR_NONE,
 						  manager->user_data);
-
+			if (manager->global_event_cb)
+				manager->global_event_cb(target_uid, pkg_type,
+						  pkg_name, event_type,
+						  PACKAGE_MANAGER_EVENT_STATE_FAILED,
+						  0,
+						  PACKAGE_MANAGER_ERROR_NONE,
+						  manager->user_data);
 		}
 	} else if (strcasecmp(key, "end") == 0) {
 		if (__find_event
 		    (&(manager->head), req_id, &event_type,
 		     &event_state) == 0) {
 			if (event_state != PACKAGE_MANAGER_EVENT_STATE_FAILED) {
-				if (manager->event_cb)
+				if (manager->event_cb && getuid() == target_uid)
 					manager->event_cb(pkg_type,
+							  pkg_name, event_type,
+							  PACKAGE_MANAGER_EVENT_STATE_COMPLETED,
+							  100,
+							  PACKAGE_MANAGER_ERROR_NONE,
+							  manager->user_data);
+				if (manager->global_event_cb)
+					manager->global_event_cb(target_uid, pkg_type,
 							  pkg_name, event_type,
 							  PACKAGE_MANAGER_EVENT_STATE_COMPLETED,
 							  100,
@@ -748,14 +802,22 @@ static int global_event_handler(int req_id, const char *pkg_type,
 							  manager->user_data);
 			}
 		} else {
-			if (strcasecmp(key, "ok") != 0)
-				if (manager->event_cb)
+			if (strcasecmp(key, "ok") != 0) {
+				if (manager->event_cb && getuid() == target_uid)
 					manager->event_cb(pkg_type,
 							  pkg_name, event_type,
 							  PACKAGE_MANAGER_EVENT_STATE_FAILED,
 							  0,
 							  PACKAGE_MANAGER_ERROR_NONE,
 							  manager->user_data);
+				if (manager->global_event_cb)
+					manager->global_event_cb(target_uid, pkg_type,
+							  pkg_name, event_type,
+							  PACKAGE_MANAGER_EVENT_STATE_FAILED,
+							  0,
+							  PACKAGE_MANAGER_ERROR_NONE,
+							  manager->user_data);
+			}
 		}
 	}
 
@@ -799,6 +861,36 @@ API int package_manager_set_event_cb(package_manager_h manager,
 }
 
 API int package_manager_unset_event_cb(package_manager_h manager)
+{
+	// TODO: Please implement this function.
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
+
+API int package_manager_set_global_event_cb(package_manager_h manager,
+				 package_manager_global_event_cb callback,
+				 void *user_data)
+{
+	if (package_manager_validate_handle(manager)) {
+		return
+		    package_manager_error
+		    (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
+		     NULL);
+	}
+
+	if (getuid() >= REGULAR_USER) {
+		_LOGE("Regular user is not allowed for this api");
+		return PACKAGE_MANAGER_ERROR_PERMISSION_DENIED;
+	}
+
+	manager->global_event_cb = callback;
+	manager->user_data = user_data;
+
+    pkgmgr_client_listen_status(manager->pc, global_event_handler, manager);
+
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
+
+API int package_manager_unset_global_event_cb(package_manager_h manager)
 {
 	// TODO: Please implement this function.
 	return PACKAGE_MANAGER_ERROR_NONE;
