@@ -414,6 +414,33 @@ typedef void (*package_manager_event_cb) (
             void *user_data);
 
 /**
+ * @brief Called when the package is installed, uninstalled or updated, and the progress of the request to the package manager changes.
+ * @since_tizen 3.0
+ *
+ * @param[in] target_uid  The uid of the package event occured
+ * @param[in] type        The type of the package to be installed, uninstalled or updated
+ * @param[in] package     The name of the package to be installed, uninstalled or updated
+ * @param[in] event_type  The type of the request to the package manager
+ * @param[in] event_state The current state of the request to the package manager
+ * @param[in] progress    The progress for the request that is being processed by the package manager \n
+ *                        The range of progress is from @c 0 to @c 100.
+ * @param[in] error       The error code when the package manager failed to process the request
+ * @param[in] user_data   The user data passed from package_manager_set_event_cb()
+ *
+ * @see package_manager_set_global_event_cb()
+ * @see package_manager_unset_global_event_cb()
+ */
+typedef void (*package_manager_global_event_cb) (
+            uid_t target_uid,
+            const char *type,
+            const char *package,
+            package_manager_event_type_e event_type,
+            package_manager_event_state_e event_state,
+            int progress,
+            package_manager_error_e error,
+            void *user_data);
+
+/**
  * @brief Creates a package manager handle.
  * @since_tizen 2.3
  * @privlevel public
@@ -511,6 +538,48 @@ int package_manager_set_event_cb(package_manager_h manager,
  * @see package_manager_set_event_cb()
  */
 int package_manager_unset_event_cb(package_manager_h manager);
+
+/**
+ * @brief Registers a callback function to be invoked when the package is installed, uninstalled or updated.
+ * @since_tizen 3.0
+ * @privlevel public
+ * @privilege %http://tizen.org/privilege/packagemanager.info
+ * @param[in] manager    The package manager handle
+ * @param[in] callback   The callback function to be registered
+ * @param[in] user_data  The user data to be passed to the callback function
+ *
+ * @return @c 0 on success,
+ *         otherwise a negative error value
+ *
+ * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
+ * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
+ * @post package_manager_global_event_cb() will be invoked.
+ *
+ * @see package_manager_set_event_status()
+ * @see package_manager_global_event_cb()
+ * @see package_manager_unset_global_event_cb()
+ */
+int package_manager_set_global_event_cb(package_manager_h manager,
+                 package_manager_global_event_cb callback,
+                 void *user_data);
+
+/**
+ * @brief Unregisters the callback function.
+ * @since_tizen 3.0
+ *
+ * @param[in] manager The package manager handle
+ *
+ * @return @c 0 on success,
+ *         otherwise a negative error value
+ *
+ * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
+ * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ *
+ * @see package_manager_global_event_cb()
+ * @see package_manager_set_global_event_cb()
+ */
+int package_manager_unset_global_event_cb(package_manager_h manager);
 
 /**
  * @brief Called to retrieve all packages.
