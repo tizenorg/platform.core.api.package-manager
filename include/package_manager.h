@@ -17,6 +17,8 @@
 #ifndef __TIZEN_APPFW_PACKAGE_MANAGER_H
 #define __TIZEN_APPFW_PACKAGE_MANAGER_H
 
+#include <sys/types.h>
+
 #include <tizen.h>
 
 #include <package_info.h>
