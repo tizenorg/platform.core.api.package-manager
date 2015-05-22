@@ -1362,3 +1362,95 @@ API int package_manager_filter_foreach_package_info(package_manager_filter_h han
 		return PACKAGE_MANAGER_ERROR_NONE;
 	}
 }
+
+API int package_manager_drm_generate_license_request(const char *resp_data, char **req_data, char **license_url)
+{
+	if (resp_data == NULL || req_data == NULL || license_url == NULL) {
+		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
+	}
+
+	/* TODO */
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
+
+API int package_manager_drm_register_license(const char *resp_data)
+{
+	if (resp_data == NULL) {
+		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
+	}
+
+	/* TODO */
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
+
+API int package_manager_drm_decrypt_package(const char *drm_file_path, const char *decrypted_file_path)
+{
+	if (drm_file_path == NULL || decrypted_file_path == NULL) {
+		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
+	}
+
+	/* TODO */
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
+
+API int package_size_info_get_data_size(package_size_info_h handle, long long *data_size)
+{
+	if (handle == NULL)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
+
+	package_size_info_t *size_info = (package_size_info_t *)handle;
+
+	*data_size = (long long)size_info->data_size;
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
+
+API int package_size_info_get_cache_size(package_size_info_h handle, long long *cache_size)
+{
+	if (handle == NULL)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
+
+	package_size_info_t *size_info = (package_size_info_t *)handle;
+
+	*cache_size = size_info->cache_size;
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
+
+API int package_size_info_get_app_size(package_size_info_h handle, long long *app_size)
+{
+	if (handle == NULL)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
+
+	package_size_info_t *size_info = (package_size_info_t *)handle;
+	*app_size = size_info->app_size;
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
+
+API int package_size_info_get_external_data_size(package_size_info_h handle, long long *ext_data_size)
+{
+	if (handle == NULL)
+		return PACKAGE_MANAGER_ERROR_INVALID_PARAMETER;
+
+	package_size_info_t *size_info = (package_size_info_t *)handle;
+	*ext_data_size = size_info->external_data_size;
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
+
+API int package_size_info_get_external_cache_size(package_size_info_h handle, long long *ext_cache_size)
+{
+	if (handle == NULL)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
+
+	package_size_info_t *size_info = (package_size_info_t *)handle;
+	*ext_cache_size = size_info->external_cache_size;
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
+
+API int package_size_info_get_external_app_size(package_size_info_h handle, long long *ext_app_size)
+{
+	if (handle == NULL)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
+
+	package_size_info_t *size_info = (package_size_info_t *)handle;
+	*ext_app_size = size_info->external_app_size;
+	return PACKAGE_MANAGER_ERROR_NONE;
+}

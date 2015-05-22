@@ -52,7 +52,7 @@ extern "C" {
 
 /**
  * @brief Enumeration for error code.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum {
 	PACKAGE_MANAGER_ERROR_NONE = TIZEN_ERROR_NONE,                                /**< Successful */
@@ -66,7 +66,7 @@ typedef enum {
 
 /**
  * @brief Enumeration for event type.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum {
 	PACKAGE_MANAGER_EVENT_TYPE_INSTALL = 0,    /**< Install event type */
@@ -81,7 +81,7 @@ typedef enum {
 
 /**
  * @brief Enumeration for event state.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum {
 	PACKAGE_MANAGER_EVENT_STATE_STARTED = 0,   /**< Started event state */
@@ -97,13 +97,13 @@ typedef enum {
 } package_manager_event_state_e;
 
 /**
- * @internal
+ * @platform
  * @brief Enumeration for request mode.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum {
-	PACKAGE_MANAGER_REQUEST_MODE_DEFAULT = 0,    /**< @internal Default request mode */
-	PACKAGE_MANAGER_REQUEST_MODE_QUIET,          /**< @internal Quiet request mode */
+	PACKAGE_MANAGER_REQUEST_MODE_DEFAULT = 0,    /**< @platform Default request mode */
+	PACKAGE_MANAGER_REQUEST_MODE_QUIET,          /**< @platform Quiet request mode */
 
 	/* These enum will be deprecated. Use above enum instead. */
 	PACAKGE_MANAGER_REQUEST_MODE_DEFAULT = 0,
@@ -112,7 +112,7 @@ typedef enum {
 
 /**
  * @brief Enumeration for move type.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum {
 	PACKAGE_MANAGER_REQUEST_MOVE_TO_INTERNAL = 0,    /**< Internal type */
@@ -125,7 +125,7 @@ typedef enum {
 
 /**
  * @brief Enumeration for certification compare type.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum {
 	PACKAGE_MANAGER_COMPARE_MATCH = 0,      /**< Matching certification */
@@ -144,7 +144,7 @@ typedef enum {
 
 /**
  * @brief Enumeration for permission type.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum {
 	PACKAGE_MANAGER_PERMISSION_NORMAL = 0,    /**< Normal permission */
@@ -154,7 +154,7 @@ typedef enum {
 
 /**
  * @brief Enumeration for status type.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef enum {
 	PACKAGE_MANAGER_STATUS_TYPE_ALL = 0x00,               /**< All status */
@@ -169,27 +169,27 @@ typedef enum {
 
 /**
  * @brief The Package manager handle.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef struct package_manager_s *package_manager_h;
 
 /**
  * @brief Package manager filter handle.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
-typedef void *package_manager_filter_h;
+typedef struct package_manager_filter_s *package_manager_filter_h;
 
 /**
- * @internal
+ * @platform
  * @brief The Package manager request handle.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef struct package_manager_request_s *package_manager_request_h;
 
 /**
- * @internal
+ * @platform
  * @brief Called when the progress of the request to the package manager changes.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in] id          The ID of the request to the package manager
  * @param[in] type        The type of the package to install, uninstall or update
@@ -215,9 +215,9 @@ typedef void (*package_manager_request_event_cb) (
             void *user_data);
 
 /**
- * @internal
+ * @platform
  * @brief Creates a request handle to the package manager.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @remarks You must release @a request using package_manager_request_destroy().
  *
@@ -236,9 +236,9 @@ typedef void (*package_manager_request_event_cb) (
 int package_manager_request_create(package_manager_request_h *request);
 
 /**
- * @internal
+ * @platform
  * @brief Destroys the request handle to the package manager.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in] request The request handle to the package manager
  *
@@ -253,9 +253,9 @@ int package_manager_request_create(package_manager_request_h *request);
 int package_manager_request_destroy(package_manager_request_h request);
 
 /**
- * @internal
+ * @platform
  * @brief Registers a callback function to be invoked when the progress of the request changes.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  * @privlevel public
  * @privilege %http://tizen.org/privilege/packagemanager.info
  * @param[in] request The request handle
@@ -277,9 +277,9 @@ int package_manager_request_set_event_cb(package_manager_request_h request,
                      package_manager_request_event_cb callback, void *user_data);
 
 /**
- * @internal
+ * @platform
  * @brief Unregisters the callback function.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in] request The request handle
  *
@@ -295,9 +295,9 @@ int package_manager_request_set_event_cb(package_manager_request_h request,
 int package_manager_request_unset_event_cb(package_manager_request_h request);
 
 /**
- * @internal
+ * @platform
  * @brief Sets the type of the package to install, uninstall or update.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in] request The request handle
  * @param[in] type    The type of the package
@@ -312,9 +312,9 @@ int package_manager_request_set_type(package_manager_request_h request,
                      const char *type);
 
 /**
- * @internal
+ * @platform
  * @brief Sets the mode of the request.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in] request The request handle
  * @param[in] mode    The mode of the request
@@ -329,9 +329,9 @@ int package_manager_request_set_mode(package_manager_request_h request,
                      package_manager_request_mode_e mode);
 
 /**
- * @internal
+ * @platform
  * @brief Installs the package located at the given path.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  * @privlevel platform
  * @privilege %http://tizen.org/privilege/packagemanager.admin
  * @param[in]  request The request handle
@@ -350,9 +350,9 @@ int package_manager_request_install(package_manager_request_h request,
                     const char *path, int *id);
 
 /**
- * @internal
+ * @platform
  * @brief Uninstalls the package with the given name.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  * @privlevel platform
  * @privilege %http://tizen.org/privilege/packagemanager.admin
  * @param[in]  request The request handle
@@ -370,9 +370,9 @@ int package_manager_request_uninstall(package_manager_request_h request,
                       const char *name, int *id);
 
 /**
- * @internal
+ * @platform
  * @brief Moves the package from SD card to the internal memory and vice versa.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  * @privlevel platform
  * @privilege %http://tizen.org/privilege/packagemanager.admin
  * @param[in] request   The request handle
@@ -392,7 +392,7 @@ int package_manager_request_move(package_manager_request_h request,
 
 /**
  * @brief Called when the package is installed, uninstalled or updated, and the progress of the request to the package manager changes.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in] type        The type of the package to be installed, uninstalled or updated
  * @param[in] package     The name of the package to be installed, uninstalled or updated
@@ -444,7 +444,7 @@ typedef void (*package_manager_global_event_cb) (
 
 /**
  * @brief Creates a package manager handle.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  * @privlevel public
  * @privilege %http://tizen.org/privilege/packagemanager.info
  * @remarks You must release @a manager using package_manager_destroy().
@@ -465,7 +465,7 @@ int package_manager_create(package_manager_h * manager);
 
 /**
  * @brief Destroys the package manager handle.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in] manager The package manager handle
  *
@@ -482,7 +482,7 @@ int package_manager_destroy(package_manager_h manager);
 /**
  * @brief Sets the event status of the package when the package is installed, uninstalled or updated.
  *        You can combine multiple status using OR operation which you want to listen.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param [in] manager     The package manager handle
  * @param [in] status_type The status of the package
@@ -501,7 +501,7 @@ int package_manager_set_event_status(package_manager_h manager, int status_type)
 
 /**
  * @brief Registers a callback function to be invoked when the package is installed, uninstalled or updated.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  * @privlevel public
  * @privilege %http://tizen.org/privilege/packagemanager.info
  * @param[in] manager    The package manager handle
@@ -526,7 +526,7 @@ int package_manager_set_event_cb(package_manager_h manager,
 
 /**
  * @brief Unregisters the callback function.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in] manager The package manager handle
  *
@@ -585,7 +585,7 @@ int package_manager_unset_global_event_cb(package_manager_h manager);
 
 /**
  * @brief Called to retrieve all packages.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in] package_info The package information
  * @param[in] user_data    The user data passed from the foreach function
@@ -601,7 +601,7 @@ typedef bool (*package_manager_package_info_cb) (
 
 /**
  * @brief Retrieves all package information of installed packages.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  * @privlevel public
  * @privilege %http://tizen.org/privilege/packagemanager.info
  * @param[in] callback  The callback function to be invoked
@@ -622,7 +622,7 @@ int package_manager_foreach_package_info(package_manager_package_info_cb callbac
 
 /**
  * @brief Gets the package ID for the given app ID.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  * @privlevel public
  * @privilege %http://tizen.org/privilege/packagemanager.info
  * @param[in]  app_id     The ID of the application
@@ -640,7 +640,7 @@ int package_manager_get_package_id_by_app_id(const char *app_id, char **package_
 
 /**
  * @brief Gets the package information for the given package.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  * @privlevel public
  * @privilege %http://tizen.org/privilege/packagemanager.info
  * @remarks You must release @a package_info using package_info_destroy().
@@ -662,7 +662,7 @@ int package_manager_get_package_info(const char *package_id, package_info_h *pac
 
 /**
  * @brief Compares whether two package certifications are matched.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]  lhs_package_id The first package ID to compare
  * @param[in]  rhs_package_id The second package ID to compare
@@ -681,7 +681,7 @@ int package_manager_compare_package_cert_info(const char *lhs_package_id, const 
 
 /**
  * @brief Compares whether two app certifications are matched.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]  lhs_app_id     The first app ID to compare
  * @param[in]  rhs_app_id     The second app ID to compare
@@ -700,7 +700,7 @@ int package_manager_compare_app_cert_info(const char *lhs_app_id, const char *rh
 
 /**
  * @brief Checks whether the package is preloaded by @a app_id.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  * @privlevel public
  * @privilege %http://tizen.org/privilege/packagemanager.info
  * @param[in]  app_id   The ID of the application
@@ -719,7 +719,7 @@ int package_manager_is_preload_package_by_app_id(const char *app_id, bool *prelo
 
 /**
  * @brief Gets the package permission type by @a app_id.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  * @privlevel public
  * @privilege %http://tizen.org/privilege/packagemanager.info
  * @param[in]  app_id          The ID of the application
@@ -737,14 +737,13 @@ int package_manager_is_preload_package_by_app_id(const char *app_id, bool *prelo
 int package_manager_get_permission_type(const char *app_id, package_manager_permission_type_e *permission_type);
 
 /**
- * @internal
  * @brief  Clears the application's internal and external cache directory.
  * @details All files stored in the cache directory of the application specified with the
  *          package ID are removed.
  *
- * @since_tizen 2.3
- * @privlevel platform
- * @privilege %http://tizen.org/privilege/packagemanager.admin
+ * @since_tizen 2.4
+ * @privlevel public
+ * @privilege %http://tizen.org/privilege/packagemanager.clearcache
  *
  * @param[in] package_id  The package ID
  *
@@ -762,11 +761,11 @@ int package_manager_get_permission_type(const char *app_id, package_manager_perm
 int package_manager_clear_cache_dir(const char *package_id);
 
 /**
- * @internal
+ * @platform
  * @brief  Clears all applications' internal and external cache directory.
  * @details All files stored in the cache directory of each application are removed.
  *
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  * @privlevel platform
  * @privilege %http://tizen.org/privilege/packagemanager.admin
  *
@@ -784,8 +783,9 @@ int package_manager_clear_cache_dir(const char *package_id);
 int package_manager_clear_all_cache_dir(void);
 
 /**
- * @brief  The structure type for data structure for the package size information.
- * @since_tizen 2.3
+ * @platform
+ * @brief  The structure type for the package size information.
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef struct package_size_info
 {
@@ -799,18 +799,25 @@ typedef struct package_size_info
 } package_size_info_t;
 
 /**
+ * @brief  The handle for the package size information.
+ * @since_tizen 2.4
+ */
+typedef package_size_info_t *package_size_info_h;
+
+/**
  * @brief  Called when the package size information is obtained.
- * @since_tizen 2.3
+ * @since_tizen 2.4
  *
  * @param[in]  package_id  The package ID
  * @param[in]  size_info   The pointer to the structure including the package size information
  * @param[in]  user_data   The user data to be passed to the callback function
  */
-typedef void (*package_manager_size_info_receive_cb)(const char *package_id, const package_size_info_t *size_info, void *user_data);
+typedef void (*package_manager_size_info_receive_cb)(const char *package_id, const package_size_info_h size_info, void *user_data);
 
 /**
+ * @platform
  * @brief  Called when the total package size information is obtained.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in]  size_info  The pointer to the structure including the package size information
  * @param[in]  user_data  The user data to be passed to the callback function
@@ -820,8 +827,10 @@ typedef void (*package_manager_total_size_info_receive_cb)(const package_size_in
 /**
  * @brief  Gets the package size information.
  * @details The package size info is asynchronously obtained by the callback function.
+ * @privlevel public
+ * @privilege %http://tizen.org/privilege/packagemanager.info
  *
- * @since_tizen 2.3
+ * @since_tizen 2.4
  *
  * @param[in]  package_id  The package ID
  * @param[in]  callback    The asynchronous callback function to get the package size information
@@ -841,9 +850,12 @@ typedef void (*package_manager_total_size_info_receive_cb)(const package_size_in
 int package_manager_get_package_size_info(const char *package_id, package_manager_size_info_receive_cb callback, void *user_data);
 
 /**
+ * @platform
  * @brief  Gets the total package size information.
  * @details The total package size info is asynchronously obtained by the callback function.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
+ * @privlevel public
+ * @privilege %http://tizen.org/privilege/packagemanager.info
  *
  * @param [in]	callback	The asynchronous callback function to get the total package size information
  * @param [in]	user_data	The user data to be passed to the callback function
@@ -864,7 +876,7 @@ int package_manager_get_total_package_size_info(package_manager_total_size_info_
 /**
  * @brief Creates the package information filter handle from db.
  * @details All filter properties will be ANDed.
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  * @privlevel public
  * @privilege %http://tizen.org/privilege/packagemanager.info
  *
@@ -884,7 +896,7 @@ int package_manager_filter_create(package_manager_filter_h *handle);
 
 /**
  * @brief This API destroys the package information filter handle freeing up all the resources
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in] handle Pointer to the package info filter handle.
  *
@@ -902,7 +914,7 @@ int package_manager_filter_destroy(package_manager_filter_h handle);
 
 /**
  * @brief This API adds a boolean filter property to the filter handle
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  *
  * @param[in] handle Pointer to the package info filter handle.
  * @param[in] property boolean property name.
@@ -924,7 +936,7 @@ int package_manager_filter_add_bool(package_manager_filter_h handle,
 
 /**
  * @brief This API counts the package that satisfy the filter conditions
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  * @privlevel public
  * @privilege %http://tizen.org/privilege/packagemanager.info
  *
@@ -945,7 +957,7 @@ int package_manager_filter_count(package_manager_filter_h handle, int *count);
 
 /**
  * @brief This API executes the user supplied callback function for each package that satisfy the filter conditions
- * @since_tizen 2.3
+ * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  * @privlevel public
  * @privilege %http://tizen.org/privilege/packagemanager.info
  *
@@ -967,6 +979,157 @@ int package_manager_filter_count(package_manager_filter_h handle, int *count);
  */
 int package_manager_filter_foreach_package_info(package_manager_filter_h handle,
 		package_manager_package_info_cb callback, void *user_data);
+
+/**
+ * @platform
+ * @brief Generates request for getting License
+ * @since_tizen 2.4
+ * @privlevel platform
+ * @privilege %http://tizen.org/privilege/packagemanager.admin
+ * @param[in] resp_data The response data string of the purchase request
+ * @param[out] req_data	License request data
+ * @param[out] license_url	License acquisition url data
+ * @remarks You must release @a req_data and @a license_url by yourself.
+ * @return 0 on success, otherwise a negative error value
+ * @retval #PACKAGE_MANAGER_ERROR_NONE Successful
+ * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY Out of memory
+ * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR Internal I/O error
+ * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
+ * @post package_manager_drm_register_license
+ */
+int package_manager_drm_generate_license_request(const char *resp_data, char **req_data, char **license_url);
+
+/**
+ * @platform
+ * @brief Registers encrypted license
+ * @since_tizen 2.4
+ * @privlevel platform
+ * @privilege %http://tizen.org/privilege/packagemanager.admin
+ * @param[in] resp_data The response data string of the rights request
+ * @return 0 on success, otherwise a negative error value
+ * @retval #PACKAGE_MANAGER_ERROR_NONE Successful
+ * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR Internal I/O error
+ * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
+ * @pre package_manager_drm_generate_license_request
+ */
+int package_manager_drm_register_license(const char *resp_data);
+
+/**
+ * @platform
+ * @brief Decrypts contents which is encrypted
+ * @since_tizen 2.4
+ * @privlevel platform
+ * @privilege %http://tizen.org/privilege/packagemanager.admin
+ * @param[in] drm_file_path DRM file path
+ * @param[in] decrypted_file_path Decrypted file path
+ * @return 0 on success, otherwise a negative error value
+ * @retval #PACKAGE_MANAGER_ERROR_NONE Successful
+ * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR Internal I/O error
+ * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
+ */
+int package_manager_drm_decrypt_package(const char *drm_file_path, const char *decrypted_file_path);
+
+/**
+ * @brief  Retrieves data size from given handle
+ *
+ * @since_tizen 2.4
+ *
+ * @param[in] handle  Package size info handle
+ * @param[out] data_size  Data size will be returned
+ *
+ * @return @c 0 on success,
+ *         otherwise a negative error value
+ *
+ * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
+ * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ */
+int package_size_info_get_data_size(package_size_info_h handle, long long *data_size);
+
+/**
+ * @brief  Retrieves cache size from given handle
+ *
+ * @since_tizen 2.4
+ *
+ * @param[in] handle  Package size info handle
+ * @param[out] cache_size  Cache size will be returned
+ *
+ * @return @c 0 on success,
+ *         otherwise a negative error value
+ *
+ * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
+ * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ */
+int package_size_info_get_cache_size(package_size_info_h handle, long long *cache_size);
+
+/**
+ * @brief  Retrieves application size from given handle
+ *
+ * @since_tizen 2.4
+ *
+ * @param[in] handle  Package size info handle
+ * @param[out] app_size  App size will be returned
+ *
+ * @return @c 0 on success,
+ *         otherwise a negative error value
+ *
+ * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
+ * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ */
+int package_size_info_get_app_size(package_size_info_h handle, long long *app_size);
+
+/**
+ * @brief  Retrieves external data size from given handle
+ *
+ * @since_tizen 2.4
+ *
+ * @param[in] handle  Package size info handle
+ * @param[out] ext_data_size  External data size will be returned
+ *
+ * @return @c 0 on success,
+ *         otherwise a negative error value
+ *
+ * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
+ * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ */
+int package_size_info_get_external_data_size(package_size_info_h handle, long long *ext_data_size);
+
+
+/**
+ * @brief  Retrieves external cache size from given handle
+ *
+ * @since_tizen 2.4
+ *
+ * @param[in] handle  Package size info handle
+ * @param[out] ext_cache_size  External cache size will be returned
+ *
+ * @return @c 0 on success,
+ *         otherwise a negative error value
+ *
+ * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
+ * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ */
+int package_size_info_get_external_cache_size(package_size_info_h handle, long long *ext_cache_size);
+
+
+/**
+ * @brief  Retrieves external application size from given handle
+ *
+ * @since_tizen 2.4
+ *
+ * @param[in] handle  Package size info handle
+ * @param[out] ext_app_size  External app size will be returned
+ *
+ * @return @c 0 on success,
+ *         otherwise a negative error value
+ *
+ * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
+ * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ */
+int package_size_info_get_external_app_size(package_size_info_h handle, long long *ext_app_size);
+
 
 /**
 * @}
