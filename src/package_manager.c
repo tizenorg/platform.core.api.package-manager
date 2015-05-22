@@ -862,6 +862,13 @@ API int package_manager_set_event_cb(package_manager_h manager,
 
 API int package_manager_unset_event_cb(package_manager_h manager)
 {
+	if (manager == NULL) {
+		return
+		    package_manager_error
+		    (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
+		     NULL);
+	}
+
 	// TODO: Please implement this function.
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
@@ -892,6 +899,13 @@ API int package_manager_set_global_event_cb(package_manager_h manager,
 
 API int package_manager_unset_global_event_cb(package_manager_h manager)
 {
+	if (manager == NULL) {
+		return
+		    package_manager_error
+		    (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
+		     NULL);
+	}
+
 	// TODO: Please implement this function.
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
@@ -902,6 +916,9 @@ API int package_manager_get_package_id_by_app_id(const char *app_id, char **pack
 	int retval;
 	char *pkg_id = NULL;
 	char *pkg_id_dup = NULL;
+
+	if (app_id == NULL || package_id == NULL)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 
 	uid_t uid = getuid();
 	if (uid != GLOBAL_USER)
@@ -1095,7 +1112,7 @@ API int package_manager_get_permission_type(const char *app_id, package_manager_
 
 API int package_manager_clear_cache_dir(const char *package_id)
 {
-	int res = pkgmgr_client_clear_cache_dir(package_id);
+	int res = pkgmgr_client_usr_clear_cache_dir(package_id, getuid());
 	if (res == PKGMGR_R_EINVAL)
 	{
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
@@ -1192,6 +1209,8 @@ API int package_manager_get_package_size_info(const char *package_id, package_ma
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
 
+	return PACKAGE_MANAGER_ERROR_NONE;
+#if 0
 	if (__cb_table == NULL)
 	{
 		__initialize_cb_table();
@@ -1206,11 +1225,11 @@ API int package_manager_get_package_size_info(const char *package_id, package_ma
 	int res = 0;
 	if (strcmp(package_id, PKG_SIZE_INFO_TOTAL) != 0)
 	{
-		res = pkgmgr_client_get_package_size_info(pc, package_id, __result_cb, user_data);
+		res = pkgmgr_client_usr_get_package_size_info(pc, package_id, __result_cb, user_data, getuid());
 	}
 	else
 	{
-		res = pkgmgr_client_get_total_package_size_info(pc, __total_result_cb, user_data);
+		res = pkgmgr_client_usr_get_total_package_size_info(pc, __total_result_cb, user_data, getuid());
 	}
 
 	if (res == PKGMGR_R_EINVAL)
@@ -1254,6 +1273,7 @@ API int package_manager_get_package_size_info(const char *package_id, package_ma
 
 	_LOGD("Successful");
 	return PACKAGE_MANAGER_ERROR_NONE;
+#endif
 }
 
 API int package_manager_get_total_package_size_info(package_manager_total_size_info_receive_cb callback, void *user_data)
