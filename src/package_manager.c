@@ -1209,8 +1209,6 @@ API int package_manager_get_package_size_info(const char *package_id, package_ma
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
 
-	return PACKAGE_MANAGER_ERROR_NONE;
-#if 0
 	if (__cb_table == NULL)
 	{
 		__initialize_cb_table();
@@ -1273,7 +1271,6 @@ API int package_manager_get_package_size_info(const char *package_id, package_ma
 
 	_LOGD("Successful");
 	return PACKAGE_MANAGER_ERROR_NONE;
-#endif
 }
 
 API int package_manager_get_total_package_size_info(package_manager_total_size_info_receive_cb callback, void *user_data)
