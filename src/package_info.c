@@ -136,11 +136,11 @@ API int package_info_foreach_app_from_package(package_info_h package_info, packa
 		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
 	}
 	if (comp_type == PACKAGE_INFO_ALLAPP)
-		pkgmgr_appinfo_get_list(pkgmgr_pkginfo, PM_ALL_APP, package_info_foreach_app_cb, &foreach_app_context);
+		pkgmgr_appinfo_get_usr_list(pkgmgr_pkginfo, PM_ALL_APP, package_info_foreach_app_cb, &foreach_app_context, uid);
 	if (comp_type == PACKAGE_INFO_UIAPP)
-		pkgmgr_appinfo_get_list(pkgmgr_pkginfo, PM_UI_APP, package_info_foreach_app_cb, &foreach_app_context);
+		pkgmgr_appinfo_get_usr_list(pkgmgr_pkginfo, PM_UI_APP, package_info_foreach_app_cb, &foreach_app_context, uid);
 	if (comp_type == PACKAGE_INFO_SERVICEAPP)
-		pkgmgr_appinfo_get_list(pkgmgr_pkginfo, PM_SVC_APP, package_info_foreach_app_cb, &foreach_app_context);
+		pkgmgr_appinfo_get_usr_list(pkgmgr_pkginfo, PM_SVC_APP, package_info_foreach_app_cb, &foreach_app_context, uid);
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
