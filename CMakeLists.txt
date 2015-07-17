@@ -11,7 +11,6 @@ pkg_check_modules(PKGS REQUIRED
 	dlog
 	vconf
 	aul
-	ail
 	pkgmgr
 	pkgmgr-info
 	libtzplatform-config)

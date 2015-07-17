@@ -10,7 +10,6 @@ BuildRequires:  cmake
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(pkgmgr)
 BuildRequires:  pkgconfig(pkgmgr-info)
-BuildRequires:  pkgconfig(ail)
 BuildRequires:	pkgconfig(vconf)
 BuildRequires:	pkgconfig(aul)
 BuildRequires:  pkgconfig(capi-base-common)
