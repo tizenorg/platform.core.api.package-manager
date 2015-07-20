@@ -79,6 +79,7 @@ static int package_info_foreach_package_info_cb(const pkgmgr_pkginfo_h handle, v
 	char *pkg_name = NULL;
 	foreach_pkg_context_s *foreach_pkg_context = user_data;
 	package_info_h package_info = NULL;
+	bool r = false;
 
 	if (handle == NULL || foreach_pkg_context == NULL)
 	{
@@ -90,12 +91,11 @@ static int package_info_foreach_package_info_cb(const pkgmgr_pkginfo_h handle, v
 
 	if (package_info_create(pkg_name, &package_info) == PACKAGE_MANAGER_ERROR_NONE)
 	{
-		foreach_pkg_context->callback(package_info, foreach_pkg_context->user_data);
+		r = foreach_pkg_context->callback(package_info, foreach_pkg_context->user_data);
 		package_info_destroy(package_info);
 	}
 
-	/* pkgmgr_get_info_list() needs to be enhanced to stop and continue callback */
-	return PKGMGR_R_OK;
+	return (r == true) ? PKGMGR_R_OK : PKGMGR_R_ERROR;
 }
 
 int package_info_foreach_package_info(package_manager_package_info_cb callback, void *user_data)
