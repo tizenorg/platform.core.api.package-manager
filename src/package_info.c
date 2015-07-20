@@ -96,6 +96,7 @@ static int package_info_foreach_app_cb (const pkgmgr_appinfo_h handle, void *use
 	pkgmgr_app_component comp;
 	foreach_app_context_s *foreach_app_context = user_data;
 	int ret = 0;
+	bool r;
 
 	if (handle == NULL || foreach_app_context == NULL)
 	{
@@ -112,9 +113,9 @@ static int package_info_foreach_app_cb (const pkgmgr_appinfo_h handle, void *use
 		return PKGMGR_R_ERROR;
 	}
 
-	foreach_app_context->callback(comp, appid, foreach_app_context->user_data);
+	r = foreach_app_context->callback(comp, appid, foreach_app_context->user_data);
 
-	return PKGMGR_R_OK;
+	return (r == true) ? PKGMGR_R_OK : PKGMGR_R_ERROR;
 }
 
 API int package_info_foreach_app_from_package(package_info_h package_info, package_info_app_component_type_e comp_type, package_info_app_cb callback, void *user_data)
