@@ -16,7 +16,6 @@
 
 #include <unistd.h>
 
-#include <package-manager.h>
 #include <pkgmgr-info.h>
 #include <tzplatform_config.h>
 
@@ -74,7 +73,7 @@ int package_info_get_package_info(const char *package, package_info_h *package_i
 	return package_info_create(package, package_info);
 }
 
-static int package_info_foreach_package_info_cb(const pkgmgr_pkginfo_h handle, void *user_data)
+static int package_info_foreach_package_info_cb(const pkgmgrinfo_pkginfo_h handle, void *user_data)
 {
 	char *pkg_name = NULL;
 	foreach_pkg_context_s *foreach_pkg_context = user_data;
@@ -84,10 +83,10 @@ static int package_info_foreach_package_info_cb(const pkgmgr_pkginfo_h handle, v
 	if (handle == NULL || foreach_pkg_context == NULL)
 	{
 		package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
-		return PKGMGR_R_EINVAL;
+		return PMINFO_R_EINVAL;
 	}
 
-	pkgmgr_pkginfo_get_pkgname(handle, &pkg_name);
+	pkgmgrinfo_pkginfo_get_pkgname(handle, &pkg_name);
 
 	if (package_info_create(pkg_name, &package_info) == PACKAGE_MANAGER_ERROR_NONE)
 	{
@@ -95,7 +94,7 @@ static int package_info_foreach_package_info_cb(const pkgmgr_pkginfo_h handle, v
 		package_info_destroy(package_info);
 	}
 
-	return (r == true) ? PKGMGR_R_OK : PKGMGR_R_ERROR;
+	return (r == true) ? PMINFO_R_OK : PMINFO_R_ERROR;
 }
 
 int package_info_foreach_package_info(package_manager_package_info_cb callback, void *user_data)
@@ -112,9 +111,9 @@ int package_info_foreach_package_info(package_manager_package_info_cb callback, 
 	}
 	uid_t uid = getuid();
 	if (uid != GLOBAL_USER)
-		ret = pkgmgr_pkginfo_get_usr_list(package_info_foreach_package_info_cb, &foreach_pkg_context, uid);
+		ret = pkgmgrinfo_pkginfo_get_usr_list(package_info_foreach_package_info_cb, &foreach_pkg_context, uid);
 	else
-		ret = pkgmgr_pkginfo_get_list(package_info_foreach_package_info_cb, &foreach_pkg_context);
+		ret = pkgmgrinfo_pkginfo_get_list(package_info_foreach_package_info_cb, &foreach_pkg_context);
 	if (ret < 0) {
 		return PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE;
 	}

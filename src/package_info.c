@@ -32,7 +32,7 @@
 
 struct package_info_s {
 	char *package;
-	pkgmgr_pkginfo_h pkgmgr_pkginfo;
+	pkgmgrinfo_pkginfo_h pkgmgr_pkginfo;
 };
 
 struct package_cert_info_s {
@@ -48,7 +48,7 @@ typedef struct _foreach_app_context_{
 API int package_info_create(const char *package, package_info_h *package_info)
 {
 	package_info_h package_info_created;
-	pkgmgr_pkginfo_h pkgmgr_pkginfo;
+	pkgmgrinfo_pkginfo_h pkgmgr_pkginfo;
 	uid_t uid = getuid();
 
 	if (package == NULL || package_info == NULL)
@@ -58,19 +58,19 @@ API int package_info_create(const char *package, package_info_h *package_info)
 
 	if (uid != GLOBAL_USER)
 	{
-		if (pkgmgr_pkginfo_get_usr_pkginfo(package, uid, &pkgmgr_pkginfo) != PKGMGR_R_OK)
+		if (pkgmgrinfo_pkginfo_get_usr_pkginfo(package, uid, &pkgmgr_pkginfo) != PKGMGR_R_OK)
 			return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
 	}
 	else
 	{
-		if (pkgmgr_pkginfo_get_pkginfo(package, &pkgmgr_pkginfo) != PKGMGR_R_OK)
+		if (pkgmgrinfo_pkginfo_get_pkginfo(package, &pkgmgr_pkginfo) != PKGMGR_R_OK)
 			return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
 	}
 	package_info_created = calloc(1, sizeof(struct package_info_s));
 
 	if (package_info_created == NULL)
 	{
-		pkgmgr_pkginfo_destroy_pkginfo(pkgmgr_pkginfo);
+		pkgmgrinfo_pkginfo_destroy_pkginfo(pkgmgr_pkginfo);
 		return package_manager_error(PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY, __FUNCTION__, NULL);
 	}
 
@@ -78,7 +78,7 @@ API int package_info_create(const char *package, package_info_h *package_info)
 
 	if (package_info_created->package == NULL)
 	{
-		pkgmgr_pkginfo_destroy_pkginfo(pkgmgr_pkginfo);
+		pkgmgrinfo_pkginfo_destroy_pkginfo(pkgmgr_pkginfo);
 		free(package_info_created);
 		return package_manager_error(PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY, __FUNCTION__, NULL);
 	}
@@ -90,10 +90,10 @@ API int package_info_create(const char *package, package_info_h *package_info)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-static int package_info_foreach_app_cb (const pkgmgr_appinfo_h handle, void *user_data)
+static int package_info_foreach_app_cb (const pkgmgrinfo_appinfo_h handle, void *user_data)
 {
 	char *appid = NULL;
-	pkgmgr_app_component comp;
+	pkgmgrinfo_app_component comp;
 	foreach_app_context_s *foreach_app_context = user_data;
 	int ret = 0;
 	bool r;
@@ -104,11 +104,11 @@ static int package_info_foreach_app_cb (const pkgmgr_appinfo_h handle, void *use
 		return PKGMGR_R_EINVAL;
 	}
 
-	ret = pkgmgr_appinfo_get_appid(handle, &appid);
+	ret = pkgmgrinfo_appinfo_get_appid(handle, &appid);
 	if (ret < 0) {
 		return PKGMGR_R_ERROR;
 	}
-	ret = pkgmgr_appinfo_get_component(handle, &comp);
+	ret = pkgmgrinfo_appinfo_get_component(handle, &comp);
 	if (ret < 0) {
 		return PKGMGR_R_ERROR;
 	}
@@ -124,7 +124,7 @@ API int package_info_foreach_app_from_package(package_info_h package_info, packa
 		.callback = callback,
 		.user_data = user_data,
 	};
-	pkgmgr_pkginfo_h pkgmgr_pkginfo;
+	pkgmgrinfo_pkginfo_h pkgmgr_pkginfo;
 	uid_t uid = getuid();
 
 	if (package_info == NULL || callback == NULL)
@@ -132,16 +132,16 @@ API int package_info_foreach_app_from_package(package_info_h package_info, packa
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
 
-	if (pkgmgr_pkginfo_get_usr_pkginfo(package_info->package,uid,&pkgmgr_pkginfo) != PKGMGR_R_OK)
+	if (pkgmgrinfo_pkginfo_get_usr_pkginfo(package_info->package,uid,&pkgmgr_pkginfo) != PKGMGR_R_OK)
 	{
 		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
 	}
 	if (comp_type == PACKAGE_INFO_ALLAPP)
-		pkgmgr_appinfo_get_usr_list(pkgmgr_pkginfo, PM_ALL_APP, package_info_foreach_app_cb, &foreach_app_context, uid);
+		pkgmgrinfo_appinfo_get_usr_list(pkgmgr_pkginfo, PMINFO_ALL_APP, package_info_foreach_app_cb, &foreach_app_context, uid);
 	if (comp_type == PACKAGE_INFO_UIAPP)
-		pkgmgr_appinfo_get_usr_list(pkgmgr_pkginfo, PM_UI_APP, package_info_foreach_app_cb, &foreach_app_context, uid);
+		pkgmgrinfo_appinfo_get_usr_list(pkgmgr_pkginfo, PMINFO_UI_APP, package_info_foreach_app_cb, &foreach_app_context, uid);
 	if (comp_type == PACKAGE_INFO_SERVICEAPP)
-		pkgmgr_appinfo_get_usr_list(pkgmgr_pkginfo, PM_SVC_APP, package_info_foreach_app_cb, &foreach_app_context, uid);
+		pkgmgrinfo_appinfo_get_usr_list(pkgmgr_pkginfo, PMINFO_SVC_APP, package_info_foreach_app_cb, &foreach_app_context, uid);
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
@@ -154,7 +154,7 @@ API int package_info_destroy(package_info_h package_info)
 
 	free(package_info->package);
 
-	pkgmgr_pkginfo_destroy_pkginfo(package_info->pkgmgr_pkginfo);
+	pkgmgrinfo_pkginfo_destroy_pkginfo(package_info->pkgmgr_pkginfo);
 
 	free(package_info);
 
@@ -192,7 +192,7 @@ API int package_info_get_label(package_info_h package_info, char **label)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
 
-	if (pkgmgr_pkginfo_get_label(package_info->pkgmgr_pkginfo, &pkg_info_value) != PKGMGR_R_OK)
+	if (pkgmgrinfo_pkginfo_get_label(package_info->pkgmgr_pkginfo, &pkg_info_value) != PKGMGR_R_OK)
 	{
 		return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
 	}
@@ -223,7 +223,7 @@ API int package_info_get_icon(package_info_h package_info, char **path)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
 
-	if (pkgmgr_pkginfo_get_icon(package_info->pkgmgr_pkginfo, &pkg_info_value) != PKGMGR_R_OK)
+	if (pkgmgrinfo_pkginfo_get_icon(package_info->pkgmgr_pkginfo, &pkg_info_value) != PKGMGR_R_OK)
 	{
 		return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
 	}
@@ -254,7 +254,7 @@ API int package_info_get_version(package_info_h package_info, char **version)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
 
-	if (pkgmgr_pkginfo_get_version(package_info->pkgmgr_pkginfo, &pkg_info_value) != PKGMGR_R_OK)
+	if (pkgmgrinfo_pkginfo_get_version(package_info->pkgmgr_pkginfo, &pkg_info_value) != PKGMGR_R_OK)
 	{
 		return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
 	}
@@ -285,7 +285,7 @@ API int package_info_get_type(package_info_h package_info, char **type)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
 
-	if (pkgmgr_pkginfo_get_type(package_info->pkgmgr_pkginfo, &pkg_info_value) != PKGMGR_R_OK)
+	if (pkgmgrinfo_pkginfo_get_type(package_info->pkgmgr_pkginfo, &pkg_info_value) != PKGMGR_R_OK)
 	{
 		return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
 	}
@@ -309,20 +309,20 @@ END:
 API int package_info_get_installed_storage(package_info_h package_info, package_info_installed_storage_type_e *storage)
 {
 	int ret = 0;
-	pkgmgr_installed_storage pkg_info_value;
+	pkgmgrinfo_installed_storage pkg_info_value;
 
 	if (package_info == NULL || storage == NULL)
 	{
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
 
-	ret = pkgmgr_pkginfo_get_installed_storage(package_info->pkgmgr_pkginfo, &pkg_info_value);
+	ret = pkgmgrinfo_pkginfo_get_installed_storage(package_info->pkgmgr_pkginfo, &pkg_info_value);
 	if (ret < 0)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
 
-	if (pkg_info_value == PM_INTERNAL_STORAGE)
+	if (pkg_info_value == PMINFO_INTERNAL_STORAGE)
 		*storage = PACKAGE_INFO_INTERNAL_STORAGE;
-	else if (pkg_info_value == PM_EXTERNAL_STORAGE)
+	else if (pkg_info_value == PMINFO_EXTERNAL_STORAGE)
 		*storage = PACKAGE_INFO_EXTERNAL_STORAGE;
 
 	return PACKAGE_MANAGER_ERROR_NONE;
@@ -368,7 +368,7 @@ API int package_info_is_system_package(package_info_h package_info, bool *system
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
 
-	if (pkgmgr_pkginfo_is_preload(package_info->pkgmgr_pkginfo, &pkg_info_value) != PKGMGR_R_OK)
+	if (pkgmgrinfo_pkginfo_is_preload(package_info->pkgmgr_pkginfo, &pkg_info_value) != PKGMGR_R_OK)
 	{
 		return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
 	}
@@ -387,7 +387,7 @@ API int package_info_is_removable_package(package_info_h package_info, bool *rem
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
 
-	if (pkgmgr_pkginfo_is_removable(package_info->pkgmgr_pkginfo, &pkg_info_value) != PKGMGR_R_OK)
+	if (pkgmgrinfo_pkginfo_is_removable(package_info->pkgmgr_pkginfo, &pkg_info_value) != PKGMGR_R_OK)
 	{
 		return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
 	}
@@ -406,7 +406,7 @@ API int package_info_is_preload_package(package_info_h package_info, bool *prelo
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
 
-	if (pkgmgr_pkginfo_is_preload(package_info->pkgmgr_pkginfo, &pkg_info_value) != PKGMGR_R_OK)
+	if (pkgmgrinfo_pkginfo_is_preload(package_info->pkgmgr_pkginfo, &pkg_info_value) != PKGMGR_R_OK)
 	{
 		return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
 	}
@@ -445,7 +445,7 @@ API int package_info_is_accessible(package_info_h package_info, bool *accessible
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
 
-	ret = pkgmgr_pkginfo_is_accessible(package_info->pkgmgr_pkginfo, &pkg_info_value);
+	ret = pkgmgrinfo_pkginfo_is_accessible(package_info->pkgmgr_pkginfo, &pkg_info_value);
 	if (ret < 0)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
 
