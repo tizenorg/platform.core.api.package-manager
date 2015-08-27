@@ -459,8 +459,6 @@ API int package_manager_request_install(package_manager_request_h request,
 		return package_manager_error(PACKAGE_MANAGER_ERROR_PERMISSION_DENIED, __FUNCTION__, NULL);
 	} else if (request_id == PKGMGR_R_ESYSTEM || request_id == PKGMGR_R_ECOMM || request_id == PKGMGR_R_ERROR) {
 		return package_manager_error(PACKAGE_MANAGER_ERROR_SYSTEM_ERROR, __FUNCTION__, NULL);
-	} else if (request_id != PKGMGR_R_OK) {
-		return package_manager_error(PACKAGE_MANAGER_ERROR_SYSTEM_ERROR, __FUNCTION__, "Unexpected error");
 	}
 
 	*id = request_id;
@@ -502,8 +500,6 @@ API int package_manager_request_uninstall(package_manager_request_h request,
 		return package_manager_error(PACKAGE_MANAGER_ERROR_PERMISSION_DENIED, __FUNCTION__, NULL);
 	} else if (request_id == PKGMGR_R_ESYSTEM || request_id == PKGMGR_R_ECOMM || request_id == PKGMGR_R_ERROR) {
 		return package_manager_error(PACKAGE_MANAGER_ERROR_SYSTEM_ERROR, __FUNCTION__, NULL);
-	} else if (request_id != PKGMGR_R_OK) {
-		return package_manager_error(PACKAGE_MANAGER_ERROR_SYSTEM_ERROR, __FUNCTION__, "Unexpected error");
 	}
 
 	*id = request_id;
@@ -542,8 +538,6 @@ API int package_manager_request_move(package_manager_request_h request,
 		return package_manager_error(PACKAGE_MANAGER_ERROR_PERMISSION_DENIED, __FUNCTION__, NULL);
 	} else if (ret == PKGMGR_R_ESYSTEM || ret == PKGMGR_R_ECOMM || ret == PKGMGR_R_ERROR) {
 		return package_manager_error(PACKAGE_MANAGER_ERROR_SYSTEM_ERROR, __FUNCTION__, NULL);
-	} else if (ret != PKGMGR_R_OK) {
-		return package_manager_error(PACKAGE_MANAGER_ERROR_SYSTEM_ERROR, __FUNCTION__, "Unexpected error");
 	}
 
 
