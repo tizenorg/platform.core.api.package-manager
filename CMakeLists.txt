@@ -13,7 +13,9 @@ pkg_check_modules(PKGS REQUIRED
 	aul
 	pkgmgr
 	pkgmgr-info
-	libtzplatform-config)
+	libtzplatform-config
+	cynara-client
+	)
 FOREACH(FLAGS ${PKGS_CFLAGS})
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${FLAGS}")
 ENDFOREACH(FLAGS)

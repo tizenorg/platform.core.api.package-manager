@@ -37,6 +37,14 @@
 extern "C" {
 #endif
 
+typedef enum {
+	PRIVILEGE_PACKAGE_MANAGER_INFO,
+	PRIVILEGE_PACKAGE_MANAGER_ADMIN,
+	PRIVILEGE_PACKAGE_MANAGER_CACHE
+} privilege_type;
+
+int check_privilege(privilege_type type);
+
 int package_manager_error(package_manager_error_e error, const char* function, const char *description);
 
 int package_info_get_package_info(const char *package, package_info_h *package_info);

@@ -18,17 +18,91 @@
 
 #include <pkgmgr-info.h>
 #include <tzplatform_config.h>
+#include <cynara-client.h>
+#include <stdio.h>
+#include <fcntl.h>
 
 #include "package_info.h"
 #include "package_manager.h"
 #include "package_manager_internal.h"
 
+#define SMACK_LABEL_LEN 255
 #define GLOBAL_USER tzplatform_getuid(TZ_SYS_GLOBALAPP_USER)
 
 typedef struct _foreach_pkg_context_{
 	package_manager_package_info_cb callback;
 	void *user_data;
 } foreach_pkg_context_s;
+
+int check_privilege(privilege_type type) {
+
+	cynara *p_cynara;
+
+	int fd = 0;
+	int ret = 0;
+
+	char subject_label[SMACK_LABEL_LEN + 1] = "";
+	char uid[10] = {0,};
+	char *client_session = "";
+
+	ret = cynara_initialize(&p_cynara, NULL);
+	if (ret != CYNARA_API_SUCCESS) {
+		LOGE("cannot init cynara [%d] failed!", ret);
+		ret = PACKAGE_MANAGER_ERROR_IO_ERROR;
+		goto out;
+	}
+
+	fd = open("/proc/self/attr/current", O_RDONLY);
+	if (fd < 0) {
+		LOGE("open [%d] failed!", errno);
+		ret = PACKAGE_MANAGER_ERROR_IO_ERROR;
+		goto out;
+	}
+
+	ret = read(fd, subject_label, SMACK_LABEL_LEN);
+	if (ret < 0) {
+		LOGE("read [%d] failed!", errno);
+		close(fd);
+		ret = PACKAGE_MANAGER_ERROR_IO_ERROR;
+		goto out;
+	}
+	close(fd);
+
+	snprintf(uid, 10, "%d", getuid());
+
+	if (type == PRIVILEGE_PACKAGE_MANAGER_INFO) {
+		ret = cynara_check(p_cynara, subject_label, client_session, uid,
+				"http://tizen.org/privilege/packagemanager.info");
+		if (ret != CYNARA_API_ACCESS_ALLOWED) {
+			LOGE("cynara access check [%d] failed!", ret);
+			ret = PACKAGE_MANAGER_ERROR_PERMISSION_DENIED;
+			goto out;
+		}
+	} else if (type == PRIVILEGE_PACKAGE_MANAGER_ADMIN) {
+		ret = cynara_check(p_cynara, subject_label, client_session, uid,
+				"http://tizen.org/privilege/packagemanager.admin");
+		if (ret != CYNARA_API_ACCESS_ALLOWED) {
+			LOGE("cynara access check [%d] failed!", ret);
+			ret = PACKAGE_MANAGER_ERROR_PERMISSION_DENIED;
+			goto out;
+		}
+	} else if (type == PRIVILEGE_PACKAGE_MANAGER_CACHE) {
+		ret = cynara_check(p_cynara, subject_label, client_session, uid,
+				"http://tizen.org/privilege/packagemanager.clearcache");
+		if (ret != CYNARA_API_ACCESS_ALLOWED) {
+			LOGE("cynara access check [%d] failed!", ret);
+			ret = PACKAGE_MANAGER_ERROR_PERMISSION_DENIED;
+			goto out;
+		}
+	}
+
+	ret = PACKAGE_MANAGER_ERROR_NONE;
+out:
+	if (p_cynara)
+		cynara_finish(p_cynara);
+
+	return ret;
+}
 
 static const char *package_manager_error_to_string(package_manager_error_e
 						   error)

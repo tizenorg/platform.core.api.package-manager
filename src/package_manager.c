@@ -143,6 +143,12 @@ API int package_manager_request_set_event_cb(package_manager_request_h request,
 					 package_manager_request_event_cb
 					 callback, void *user_data)
 {
+
+	int retval;
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_INFO);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
+
 	if (package_manager_client_validate_handle(request)) {
 		return
 		    package_manager_error
@@ -425,6 +431,12 @@ static int request_event_handler(uid_t target_uid, int req_id, const char *pkg_t
 API int package_manager_request_install(package_manager_request_h request,
 				    const char *path, int *id)
 {
+
+	int retval;
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_ADMIN);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
+
 	if (package_manager_client_validate_handle(request)) {
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
@@ -469,6 +481,12 @@ API int package_manager_request_install(package_manager_request_h request,
 API int package_manager_request_uninstall(package_manager_request_h request,
 				      const char *name, int *id)
 {
+
+	int retval;
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_ADMIN);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
+
 	if (package_manager_client_validate_handle(request)) {
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
@@ -510,6 +528,12 @@ API int package_manager_request_uninstall(package_manager_request_h request,
 API int package_manager_request_move(package_manager_request_h request,
 				    const char *name, package_manager_move_type_e move_type)
 {
+
+	int retval;
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_ADMIN);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
+
 	if (package_manager_client_validate_handle(request)) {
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
@@ -546,6 +570,12 @@ API int package_manager_request_move(package_manager_request_h request,
 
 API int package_manager_create(package_manager_h * manager)
 {
+
+	int retval;
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_INFO);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
+
 	struct package_manager_s *package_manager = NULL;
 
 	if (manager == NULL) {
@@ -839,6 +869,12 @@ API int package_manager_set_event_cb(package_manager_h manager,
 				 package_manager_event_cb callback,
 				 void *user_data)
 {
+
+	int retval;
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_INFO);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
+
 	if (package_manager_validate_handle(manager)) {
 		return
 		    package_manager_error
@@ -871,6 +907,12 @@ API int package_manager_set_global_event_cb(package_manager_h manager,
 				 package_manager_global_event_cb callback,
 				 void *user_data)
 {
+
+	int retval;
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_INFO);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
+
 	if (package_manager_validate_handle(manager)) {
 		return
 		    package_manager_error
@@ -911,6 +953,10 @@ API int package_manager_get_package_id_by_app_id(const char *app_id, char **pack
 	char *pkg_id = NULL;
 	char *pkg_id_dup = NULL;
 
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_INFO);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
+
 	if (app_id == NULL || package_id == NULL)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 
@@ -947,6 +993,9 @@ API int package_manager_get_package_id_by_app_id(const char *app_id, char **pack
 API int package_manager_get_package_info(const char *package_id, package_info_h *package_info)
 {
 	int retval;
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_INFO);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
 
 	retval = package_info_get_package_info(package_id, package_info);
 
@@ -959,7 +1008,11 @@ API int package_manager_get_package_info(const char *package_id, package_info_h 
 API int package_manager_foreach_package_info(package_manager_package_info_cb callback,
 					void *user_data)
 {
+
 	int retval;
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_INFO);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
 
 	retval = package_info_foreach_package_info(callback, user_data);
 
@@ -1016,10 +1069,15 @@ API int package_manager_compare_app_cert_info(const char *lhs_app_id, const char
 
 API int package_manager_is_preload_package_by_app_id(const char *app_id, bool *preload)
 {
+
+	int retval;
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_INFO);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
+
 	pkgmgrinfo_appinfo_h pkgmgrinfo_appinfo = NULL;
 	pkgmgrinfo_pkginfo_h pkgmgrinfo_pkginfo = NULL;
 
-	int retval =0;
 	char *pkg_id = NULL;
 	bool is_preload = 0;
 	uid_t uid = getuid();
@@ -1075,7 +1133,12 @@ API int package_manager_is_preload_package_by_app_id(const char *app_id, bool *p
 
 API int package_manager_get_permission_type(const char *app_id, package_manager_permission_type_e *permission_type)
 {
-	int retval = 0;
+
+	int retval;
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_INFO);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
+
 	pkgmgrinfo_appinfo_h pkgmgrinfo_appinfo =NULL;
 	pkgmgrinfo_permission_type permission = 0;
 	uid_t uid = getuid();
@@ -1106,6 +1169,12 @@ API int package_manager_get_permission_type(const char *app_id, package_manager_
 
 API int package_manager_clear_cache_dir(const char *package_id)
 {
+
+	int retval;
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_CACHE);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
+
 	int res = pkgmgr_client_usr_clear_cache_dir(package_id, getuid());
 	if (res == PKGMGR_R_EINVAL)
 	{
@@ -1142,6 +1211,12 @@ API int package_manager_clear_cache_dir(const char *package_id)
 
 API int package_manager_clear_all_cache_dir(void)
 {
+
+	int retval;
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_ADMIN);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
+
 	return package_manager_clear_cache_dir(PKG_CLEAR_ALL_CACHE);
 }
 
@@ -1277,6 +1352,10 @@ API int package_manager_filter_create(package_manager_filter_h *handle)
 	int retval;
 	pkgmgrinfo_pkginfo_filter_h pkgmgr_filter = NULL;
 
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_INFO);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
+
 	if (handle == NULL)
 	{
 		return
@@ -1341,7 +1420,11 @@ API int package_manager_filter_add_bool(package_manager_filter_h handle,
 
 API int package_manager_filter_count(package_manager_filter_h handle, int *count)
 {
-	int retval = 0;
+
+	int retval;
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_INFO);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
 
 	if ((handle == NULL) || (count == NULL))
 	{
@@ -1360,7 +1443,11 @@ API int package_manager_filter_count(package_manager_filter_h handle, int *count
 API int package_manager_filter_foreach_package_info(package_manager_filter_h handle,
 		package_manager_package_info_cb callback, void *user_data)
 {
+
 	int retval;
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_INFO);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
 
 	retval = package_info_filter_foreach_package_info(handle, callback, user_data);
 
@@ -1376,6 +1463,12 @@ API int package_manager_filter_foreach_package_info(package_manager_filter_h han
 
 API int package_manager_drm_generate_license_request(const char *resp_data, char **req_data, char **license_url)
 {
+
+	int retval;
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_ADMIN);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
+
 	if (resp_data == NULL || req_data == NULL || license_url == NULL) {
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
@@ -1386,6 +1479,12 @@ API int package_manager_drm_generate_license_request(const char *resp_data, char
 
 API int package_manager_drm_register_license(const char *resp_data)
 {
+
+	int retval;
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_ADMIN);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
+
 	if (resp_data == NULL) {
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
@@ -1396,6 +1495,12 @@ API int package_manager_drm_register_license(const char *resp_data)
 
 API int package_manager_drm_decrypt_package(const char *drm_file_path, const char *decrypted_file_path)
 {
+
+	int retval;
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_ADMIN);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
+
 	if (drm_file_path == NULL || decrypted_file_path == NULL) {
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	}
