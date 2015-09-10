@@ -12,6 +12,7 @@ pkg_check_modules(PKGS REQUIRED
 	vconf
 	aul
 	pkgmgr
+	pkgmgr-installer
 	pkgmgr-info
 	libtzplatform-config
 	cynara-client

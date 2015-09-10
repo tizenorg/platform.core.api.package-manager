@@ -20,6 +20,7 @@
 #include <unistd.h>
 
 #include <package-manager.h>
+#include <pkgmgr_installer.h>
 #include <pkgmgr-info.h>
 #include <tzplatform_config.h>
 
@@ -213,11 +214,11 @@ static int package_manager_get_event_type(const char *key,
 	if (key == NULL)
 		return PACKAGE_MANAGER_ERROR_INVALID_PARAMETER;
 
-	if (strcasecmp(key, "install") == 0)
+	if (strcasecmp(key, PKGMGR_INSTALLER_INSTALL_EVENT_STR) == 0)
 		*event_type = PACKAGE_MANAGER_EVENT_TYPE_INSTALL;
-	else if (strcasecmp(key, "uninstall") == 0)
+	else if (strcasecmp(key, PKGMGR_INSTALLER_UNINSTALL_EVENT_STR) == 0)
 		*event_type = PACKAGE_MANAGER_EVENT_TYPE_UNINSTALL;
-	else if (strcasecmp(key, "update") == 0)
+	else if (strcasecmp(key, PKGMGR_INSTALLER_UPGRADE_EVENT_STR) == 0)
 		*event_type = PACKAGE_MANAGER_EVENT_TYPE_UPDATE;
 	else
 		return PACKAGE_MANAGER_ERROR_INVALID_PARAMETER;

@@ -9,6 +9,7 @@ Source1001: 	capi-appfw-package-manager.manifest
 BuildRequires:  cmake
 BuildRequires:  pkgconfig(dlog)
 BuildRequires:  pkgconfig(pkgmgr)
+BuildRequires:  pkgconfig(pkgmgr-installer)
 BuildRequires:  pkgconfig(pkgmgr-info)
 BuildRequires:	pkgconfig(vconf)
 BuildRequires:	pkgconfig(aul)
