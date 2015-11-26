@@ -18,6 +18,7 @@
 #define __TIZEN_APPFW_PACKAGE_MANAGER_INTERNAL_H__
 
 #include <dlog.h>
+#include <pkgmgr-info.h>
 #include "package_manager.h"
 
 #ifndef API

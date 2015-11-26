@@ -16,6 +16,7 @@ BuildRequires:	pkgconfig(aul)
 BuildRequires:  pkgconfig(capi-base-common)
 BuildRequires:  pkgconfig(libtzplatform-config)
 BuildRequires:  pkgconfig(glib-2.0)
+BuildRequires:  pkgconfig(gio-2.0)
 BuildRequires:  pkgconfig(cynara-client)
 
 %description
