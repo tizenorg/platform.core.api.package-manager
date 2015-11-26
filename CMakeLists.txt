@@ -3,6 +3,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 PROJECT(capi-appfw-package-manager C)
 SET(SOURCES src/package_info.c
 	src/package_manager.c
+	src/package_manager_drm.c
 	src/package_manager_internal.c)
 
 INCLUDE(FindPkgConfig)

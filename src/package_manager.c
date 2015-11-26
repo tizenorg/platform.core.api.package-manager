@@ -1462,54 +1462,6 @@ API int package_manager_filter_foreach_package_info(package_manager_filter_h han
 	}
 }
 
-API int package_manager_drm_generate_license_request(const char *resp_data, char **req_data, char **license_url)
-{
-
-	int retval;
-	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_ADMIN);
-	if (retval != PACKAGE_MANAGER_ERROR_NONE)
-		return retval;
-
-	if (resp_data == NULL || req_data == NULL || license_url == NULL) {
-		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
-	}
-
-	/* TODO */
-	return PACKAGE_MANAGER_ERROR_NONE;
-}
-
-API int package_manager_drm_register_license(const char *resp_data)
-{
-
-	int retval;
-	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_ADMIN);
-	if (retval != PACKAGE_MANAGER_ERROR_NONE)
-		return retval;
-
-	if (resp_data == NULL) {
-		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
-	}
-
-	/* TODO */
-	return PACKAGE_MANAGER_ERROR_NONE;
-}
-
-API int package_manager_drm_decrypt_package(const char *drm_file_path, const char *decrypted_file_path)
-{
-
-	int retval;
-	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_ADMIN);
-	if (retval != PACKAGE_MANAGER_ERROR_NONE)
-		return retval;
-
-	if (drm_file_path == NULL || decrypted_file_path == NULL) {
-		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
-	}
-
-	/* TODO */
-	return PACKAGE_MANAGER_ERROR_NONE;
-}
-
 API int package_size_info_get_data_size(package_size_info_h handle, long long *data_size)
 {
 	if (handle == NULL)
