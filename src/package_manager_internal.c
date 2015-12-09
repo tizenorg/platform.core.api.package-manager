@@ -29,12 +29,13 @@
 #define SMACK_LABEL_LEN 255
 #define GLOBAL_USER tzplatform_getuid(TZ_SYS_GLOBALAPP_USER)
 
-typedef struct _foreach_pkg_context_{
+typedef struct _foreach_pkg_context_ {
 	package_manager_package_info_cb callback;
 	void *user_data;
 } foreach_pkg_context_s;
 
-int check_privilege(privilege_type type) {
+int check_privilege(privilege_type type)
+{
 
 	cynara *p_cynara;
 
@@ -154,16 +155,14 @@ static int package_info_foreach_package_info_cb(const pkgmgrinfo_pkginfo_h handl
 	package_info_h package_info = NULL;
 	bool r = false;
 
-	if (handle == NULL || foreach_pkg_context == NULL)
-	{
+	if (handle == NULL || foreach_pkg_context == NULL) {
 		package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 		return PMINFO_R_EINVAL;
 	}
 
 	pkgmgrinfo_pkginfo_get_pkgname(handle, &pkg_name);
 
-	if (package_info_create(pkg_name, &package_info) == PACKAGE_MANAGER_ERROR_NONE)
-	{
+	if (package_info_create(pkg_name, &package_info) == PACKAGE_MANAGER_ERROR_NONE) {
 		r = foreach_pkg_context->callback(package_info, foreach_pkg_context->user_data);
 		package_info_destroy(package_info);
 	}
@@ -180,17 +179,16 @@ int package_info_foreach_package_info(package_manager_package_info_cb callback, 
 	int ret = 0;
 
 	if (callback == NULL)
-	{
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
-	}
+
 	uid_t uid = getuid();
 	if (uid != GLOBAL_USER)
 		ret = pkgmgrinfo_pkginfo_get_usr_list(package_info_foreach_package_info_cb, &foreach_pkg_context, uid);
 	else
 		ret = pkgmgrinfo_pkginfo_get_list(package_info_foreach_package_info_cb, &foreach_pkg_context);
-	if (ret < 0) {
+
+	if (ret < 0)
 		return PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE;
-	}
 
 	return PACKAGE_MANAGER_ERROR_NONE;
 }

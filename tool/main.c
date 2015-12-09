@@ -71,9 +71,8 @@ static int _get_packageinfo(const char *package)
 
 
 	ret = package_manager_get_package_info(package, &package_info);
-	if (ret != PACKAGE_MANAGER_ERROR_NONE) {
+	if (ret != PACKAGE_MANAGER_ERROR_NONE)
 		return PACKAGE_MANAGER_ERROR_INVALID_PARAMETER;
-	}
 
 	package_info_get_package(package_info, &pkg);
 	package_info_get_label(package_info, &label);
@@ -98,9 +97,8 @@ static int _get_packageinfo(const char *package)
 	package_info_foreach_cert_info(package_info, _cert_info_cb, NULL);
 
 	ret = package_info_destroy(package_info);
-	if (ret != PACKAGE_MANAGER_ERROR_NONE) {
+	if (ret != PACKAGE_MANAGER_ERROR_NONE)
 		return PACKAGE_MANAGER_ERROR_INVALID_PARAMETER;
-	}
 
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
