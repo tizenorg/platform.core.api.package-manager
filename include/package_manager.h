@@ -32,7 +32,7 @@ extern "C" {
  */
 
 /**
- * @addtogroup CAPI_PACKAGE_MANAGER_MODULE
+ * @addtogroup CAPI_PACKAGE_REQUEST_MODULE
  * @{
  */
 
@@ -327,6 +327,23 @@ int package_manager_request_set_type(package_manager_request_h request,
  */
 int package_manager_request_set_mode(package_manager_request_h request,
                      package_manager_request_mode_e mode);
+
+/**
+ * @platform
+ * @brief Sets the path of TEP file to the request. The TEP file that is set will be installed when the package is installed.
+ * @since_tizen 2.4
+ * @privlevel platform
+ * @privilege %http://tizen.org/privilege/packagemanager.admin
+ * @param[in] request The request handle
+ * @param[in] tep_path The tep path to set. If this is NULL on update, installed tep will be removed.
+ * @return 0 on success, otherwise a negative error value
+ * @retval #PACKAGE_MANAGER_ERROR_NONE Successful
+ * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
+ * @retval #PACKAGE_MANAGER_ERROR_SYSTEM_ERROR		 Severe system error
+ */
+int package_manager_request_set_tep(package_manager_request_h request,
+                     const char *tep_path);
 
 /**
  * @platform
@@ -783,26 +800,10 @@ int package_manager_clear_cache_dir(const char *package_id);
 int package_manager_clear_all_cache_dir(void);
 
 /**
- * @platform
- * @brief  The structure type for the package size information.
- * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
- */
-typedef struct package_size_info
-{
-    long long data_size;            /**< The size of files in the application's internal data directory */
-    long long cache_size;           /**< The size of files in the application's internal cache directory */
-    long long app_size;             /**< The size of files in the application's internal bin, lib, and
-                                         res directories */
-    long long external_data_size;   /**< The size of files in the application's external data directory */
-    long long external_cache_size;  /**< The size of files in the application's external cache directory */
-    long long external_app_size;    /**< The size of files in the application's res directory */
-} package_size_info_t;
-
-/**
  * @brief  The handle for the package size information.
  * @since_tizen 2.4
  */
-typedef package_size_info_t *package_size_info_h;
+typedef struct package_size_info_t *package_size_info_h;
 
 /**
  * @brief  Called when the package size information is obtained.
@@ -822,7 +823,7 @@ typedef void (*package_manager_size_info_receive_cb)(const char *package_id, con
  * @param[in]  size_info  The pointer to the structure including the package size information
  * @param[in]  user_data  The user data to be passed to the callback function
  */
-typedef void (*package_manager_total_size_info_receive_cb)(const package_size_info_t *size_info, void *user_data);
+typedef void (*package_manager_total_size_info_receive_cb)(const package_size_info_h size_info, void *user_data);
 
 /**
  * @brief  Gets the package size information.

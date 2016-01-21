@@ -61,6 +61,17 @@ struct package_manager_request_s {
 	void *user_data;
 };
 
+typedef struct package_size_info
+{
+    long long data_size;
+    long long cache_size;
+    long long app_size;
+
+    long long external_data_size;
+    long long external_cache_size;
+    long long external_app_size;
+} package_size_info_t;
+
 struct package_manager_filter_s {
 	pkgmgrinfo_pkginfo_filter_h pkgmgrinfo_pkginfo_filter;
 };
