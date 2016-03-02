@@ -88,6 +88,8 @@ typedef enum {
 	PACKAGE_MANAGER_EVENT_TYPE_INSTALL = 0,    /**< Install event type */
 	PACKAGE_MANAGER_EVENT_TYPE_UNINSTALL,      /**< Uninstall event type */
 	PACKAGE_MANAGER_EVENT_TYPE_UPDATE,         /**< Update event type */
+	PACKAGE_MANAGER_EVENT_TYPE_ENABLE_APP,
+	PACKAGE_MANAGER_EVENT_TYPE_DISABLE_APP,
 
 	/* These enum will be deprecated. Use above enum instead. */
 	PACAKGE_MANAGER_EVENT_TYPE_INSTALL = 0,
@@ -180,6 +182,32 @@ typedef struct package_manager_s *package_manager_h;
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef struct package_manager_filter_s *package_manager_filter_h;
+
+/**
+ * @brief Called when the application is enabled or disabled.
+ * @since_tizen 3.0
+ *
+ * @param[in] type        The type of the package which contain application to be disabled or enabled
+ * @param[in] package     The name of the package which contain application to be disabled or enabled
+ * @param[in] application     The name of the application to be disabled or enabled
+ * @param[in] event_type  The type of the request to the package manager
+ * @param[in] event_state The current state of the request to the package manager
+ * @param[in] progress    The progress for the request that is being processed by the package manager \n
+ *                        The range of progress is from @c 0 to @c 100.
+ * @param[in] error       The error code when the package manager failed to process the request
+ * @param[in] user_data   The user data passed from package_manager_set_event_cb()
+ *
+ * @see package_manager_set_app_event_cb()
+ */
+typedef void (*package_manager_app_event_cb) (
+            const char *type,
+            const char *package,
+            const char *application,
+            package_manager_event_type_e event_type,
+            package_manager_event_state_e event_state,
+            int progress,
+            package_manager_error_e error,
+            void *user_data);
 
 /**
  * @brief Called when the package is installed, uninstalled or updated, and the progress of the request to the package manager changes.
@@ -289,6 +317,30 @@ int package_manager_destroy(package_manager_h manager);
  * @see package_manager_set_event_cb()
  */
 int package_manager_set_event_status(package_manager_h manager, int status_type);
+
+/**
+ * @brief Registers a callback function to be invoked when the application is enabled or disabled.
+ * @since_tizen 3.0
+ * @privlevel public
+ * @privilege %http://tizen.org/privilege/packagemanager.info
+ * @param[in] manager    The package manager handle
+ * @param[in] callback   The callback function to be registered
+ * @param[in] user_data  The user data to be passed to the callback function
+ *
+ * @return @c 0 on success,
+ *         otherwise a negative error value
+ *
+ * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
+ * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
+ * @post package_manager_event_cb() will be invoked.
+ *
+ * @see package_manager_set_event_status()
+ * @see package_manager_app_event_cb()
+ */
+int package_manager_set_app_event_cb(package_manager_h manager,
+				 package_manager_app_event_cb callback,
+				 void *user_data);
 
 /**
  * @brief Registers a callback function to be invoked when the package is installed, uninstalled or updated.
