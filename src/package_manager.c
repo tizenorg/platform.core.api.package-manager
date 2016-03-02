@@ -43,6 +43,7 @@ struct package_manager_s {
 	pkgmgr_client *pc;
 	pkgmgr_mode mode;
 	event_info *head;
+	package_manager_app_event_cb app_event_cb;
 	package_manager_event_cb event_cb;
 	package_manager_global_event_cb global_event_cb;
 	void *user_data;
@@ -229,6 +230,12 @@ static int package_manager_get_event_type(const char *key,
 		*event_type = PACKAGE_MANAGER_EVENT_TYPE_UNINSTALL;
 	else if (strcasecmp(key, PKGMGR_INSTALLER_UPGRADE_EVENT_STR) == 0)
 		*event_type = PACKAGE_MANAGER_EVENT_TYPE_UPDATE;
+	else if (strcasecmp(key, PKGMGR_INSTALLER_APP_DISABLE_EVENT_STR) == 0
+			|| strcasecmp(key, PKGMGR_INSTALLER_GLOBAL_APP_DISABLE_FOR_UID) == 0)
+		*event_type = PACKAGE_MANAGER_EVENT_TYPE_DISABLE_APP;
+	else if (strcasecmp(key, PKGMGR_INSTALLER_APP_ENABLE_EVENT_STR) == 0
+			|| strcasecmp(key,PKGMGR_INSTALLER_GLOBAL_APP_ENABLE_FOR_UID) == 0)
+		*event_type = PACKAGE_MANAGER_EVENT_TYPE_ENABLE_APP;
 	else
 		return PACKAGE_MANAGER_ERROR_INVALID_PARAMETER;
 
@@ -724,6 +731,78 @@ static int __validate_event_signal(uid_t target_uid)
 	return -1;
 }
 
+static int global_app_event_handler(uid_t target_uid, int req_id, const char *pkg_type,
+				const char *pkgid, const char *appid, const char *key,
+				const char *val, const void *pmsg, void *data)
+{
+	int ret = -1;
+	package_manager_event_type_e event_type = -1;
+	package_manager_event_state_e event_state = -1;
+
+	_LOGD("global_app_event_handler is called");
+
+	package_manager_h manager = data;
+
+	if (strcasecmp(key, "start") == 0) {
+		ret = package_manager_get_event_type(val, &event_type);
+		if (ret != PACKAGE_MANAGER_ERROR_NONE)
+			return PACKAGE_MANAGER_ERROR_INVALID_PARAMETER;
+		__add_event(&(manager->head), req_id, event_type,
+				 PACKAGE_MANAGER_EVENT_STATE_COMPLETED);
+
+		if (manager->app_event_cb && getuid() == target_uid) {
+			manager->app_event_cb(pkg_type, pkgid, appid,
+					  event_type,
+					  PACKAGE_MANAGER_EVENT_STATE_STARTED,
+					  0, PACKAGE_MANAGER_ERROR_NONE, manager->user_data);
+		}
+	} else if (strcasecmp(key, "error") == 0) {
+		if (strcasecmp(key, "0") != 0) {
+			if (__find_event
+			    (&(manager->head), req_id, &event_type,
+			     &event_state) == 0) {
+				__update_event(&(manager->head), req_id,
+						    event_type,
+						    PACKAGE_MANAGER_EVENT_STATE_FAILED);
+			}
+
+			if (manager->app_event_cb && getuid() == target_uid)
+				manager->app_event_cb(pkg_type,
+						  pkgid, appid, event_type,
+						  PACKAGE_MANAGER_EVENT_STATE_FAILED,
+						  0,
+						  PACKAGE_MANAGER_ERROR_NONE,
+						  manager->user_data);
+		}
+	} else if (strcasecmp(key, "end") == 0) {
+		if (__find_event
+		    (&(manager->head), req_id, &event_type,
+		     &event_state) == 0) {
+			if (event_state != PACKAGE_MANAGER_EVENT_STATE_FAILED) {
+				if (manager->app_event_cb && getuid() == target_uid)
+					manager->app_event_cb(pkg_type,
+							  pkgid, appid, event_type,
+							  PACKAGE_MANAGER_EVENT_STATE_COMPLETED,
+							  100,
+							  PACKAGE_MANAGER_ERROR_NONE,
+							  manager->user_data);
+			}
+		} else {
+			if (strcasecmp(key, "ok") != 0) {
+				if (manager->app_event_cb && getuid() == target_uid)
+					manager->app_event_cb(pkg_type,
+							  pkgid, appid, event_type,
+							  PACKAGE_MANAGER_EVENT_STATE_FAILED,
+							  0,
+							  PACKAGE_MANAGER_ERROR_NONE,
+							  manager->user_data);
+			}
+		}
+	}
+
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
+
 static int global_event_handler(uid_t target_uid, int req_id, const char *pkg_type,
 				const char *pkg_name, const char *key,
 				const char *val, const void *pmsg, void *data)
@@ -861,6 +940,31 @@ API int package_manager_set_event_status(package_manager_h manager, int status_t
 
 	if (retval < 0)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
+
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
+
+API int package_manager_set_app_event_cb(package_manager_h manager,
+				 package_manager_app_event_cb callback,
+				 void *user_data)
+{
+
+	int retval;
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_INFO);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
+
+	if (package_manager_validate_handle(manager)) {
+		return
+		    package_manager_error
+		    (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
+		     NULL);
+	}
+
+	manager->app_event_cb = callback;
+	manager->user_data = user_data;
+
+	pkgmgr_client_listen_app_status(manager->pc, global_app_event_handler, manager);
 
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
