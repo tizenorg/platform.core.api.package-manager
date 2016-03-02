@@ -88,11 +88,8 @@ typedef enum {
 	PACKAGE_MANAGER_EVENT_TYPE_INSTALL = 0,    /**< Install event type */
 	PACKAGE_MANAGER_EVENT_TYPE_UNINSTALL,      /**< Uninstall event type */
 	PACKAGE_MANAGER_EVENT_TYPE_UPDATE,         /**< Update event type */
-
-	/* These enum will be deprecated. Use above enum instead. */
-	PACAKGE_MANAGER_EVENT_TYPE_INSTALL = 0,
-	PACAKGE_MANAGER_EVENT_TYPE_UNINSTALL,
-	PACAKGE_MANAGER_EVENT_TYPE_UPDATE,
+	PACKAGE_MANAGER_EVENT_TYPE_ENABLE_APP,
+	PACKAGE_MANAGER_EVENT_TYPE_DISABLE_APP,
 } package_manager_event_type_e;
 
 /**
@@ -104,12 +101,6 @@ typedef enum {
 	PACKAGE_MANAGER_EVENT_STATE_PROCESSING,    /**< Processing event state */
 	PACKAGE_MANAGER_EVENT_STATE_COMPLETED,     /**< Completed event state */
 	PACKAGE_MANAGER_EVENT_STATE_FAILED,        /**< Failed event state */
-
-	/* These enum will be deprecated. Use above enum instead. */
-	PACAKGE_MANAGER_EVENT_STATE_STARTED = 0,
-	PACAKGE_MANAGER_EVENT_STATE_PROCESSING,
-	PACAKGE_MANAGER_EVENT_STATE_COMPLETED,
-	PACAKGE_MANAGER_EVENT_STATE_FAILED,
 } package_manager_event_state_e;
 
 /**
@@ -119,10 +110,6 @@ typedef enum {
 typedef enum {
 	PACKAGE_MANAGER_REQUEST_MOVE_TO_INTERNAL = 0,    /**< Internal type */
 	PACKAGE_MANAGER_REQUEST_MOVE_TO_EXTERNAL,        /**< External type */
-
-	/* These enum will be deprecated. Use above enum instead. */
-	PACAKGE_MANAGER_REQUEST_MOVE_TO_INTERNAL = 0,
-	PACAKGE_MANAGER_REQUEST_MOVE_TO_EXTERNAL,
 } package_manager_move_type_e;
 
 /**
@@ -135,13 +122,6 @@ typedef enum {
 	PACKAGE_MANAGER_COMPARE_LHS_NO_CERT,    /**< First package has no certification */
 	PACKAGE_MANAGER_COMPARE_RHS_NO_CERT,    /**< Second package has no certification */
 	PACKAGE_MANAGER_COMPARE_BOTH_NO_CERT,   /**< Both have no certification */
-
-	/* These enum will be deprecated. Use above enum instead. */
-	PACAKGE_MANAGER_COMPARE_MATCH = 0,
-	PACAKGE_MANAGER_COMPARE_MISMATCH,
-	PACAKGE_MANAGER_COMPARE_LHS_NO_CERT,
-	PACAKGE_MANAGER_COMPARE_RHS_NO_CERT,
-	PACAKGE_MANAGER_COMPARE_BOTH_NO_CERT,
 } package_manager_compare_result_type_e;
 
 /**
@@ -180,6 +160,32 @@ typedef struct package_manager_s *package_manager_h;
  * @since_tizen @if MOBILE 2.3 @elseif WEARABLE 2.3.1 @endif
  */
 typedef struct package_manager_filter_s *package_manager_filter_h;
+
+/**
+ * @brief Called when the application is enabled or disabled.
+ * @since_tizen 3.0
+ *
+ * @param[in] type        The type of the package which contain application to be disabled or enabled
+ * @param[in] package     The name of the package which contain application to be disabled or enabled
+ * @param[in] application     The name of the application to be disabled or enabled
+ * @param[in] event_type  The type of the request to the package manager
+ * @param[in] event_state The current state of the request to the package manager
+ * @param[in] progress    The progress for the request that is being processed by the package manager \n
+ *                        The range of progress is from @c 0 to @c 100.
+ * @param[in] error       The error code when the package manager failed to process the request
+ * @param[in] user_data   The user data passed from package_manager_set_event_cb()
+ *
+ * @see package_manager_set_app_event_cb()
+ */
+typedef void (*package_manager_app_event_cb) (
+            const char *type,
+            const char *package,
+            const char *application,
+            package_manager_event_type_e event_type,
+            package_manager_event_state_e event_state,
+            int progress,
+            package_manager_error_e error,
+            void *user_data);
 
 /**
  * @brief Called when the package is installed, uninstalled or updated, and the progress of the request to the package manager changes.
@@ -248,7 +254,6 @@ typedef void (*package_manager_global_event_cb) (
  * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
  * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
  * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY     Out of memory
- * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR          Internal I/O error
  * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
  * @see package_manager_destroy()
  */
@@ -289,6 +294,30 @@ int package_manager_destroy(package_manager_h manager);
  * @see package_manager_set_event_cb()
  */
 int package_manager_set_event_status(package_manager_h manager, int status_type);
+
+/**
+ * @brief Registers a callback function to be invoked when the application is enabled or disabled.
+ * @since_tizen 3.0
+ * @privlevel public
+ * @privilege %http://tizen.org/privilege/packagemanager.info
+ * @param[in] manager    The package manager handle
+ * @param[in] callback   The callback function to be registered
+ * @param[in] user_data  The user data to be passed to the callback function
+ *
+ * @return @c 0 on success,
+ *         otherwise a negative error value
+ *
+ * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
+ * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
+ * @post package_manager_event_cb() will be invoked.
+ *
+ * @see package_manager_set_event_status()
+ * @see package_manager_app_event_cb()
+ */
+int package_manager_set_app_event_cb(package_manager_h manager,
+				 package_manager_app_event_cb callback,
+				 void *user_data);
 
 /**
  * @brief Registers a callback function to be invoked when the package is installed, uninstalled or updated.
@@ -403,6 +432,7 @@ typedef bool (*package_manager_package_info_cb) (
  *
  * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
  * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ * @retval #PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE          No such package
  * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
  * @post This function invokes package_manager_package_info_cb() repeatedly for each package information.
  *
@@ -445,8 +475,8 @@ int package_manager_get_package_id_by_app_id(const char *app_id, char **package_
  * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
  * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
  * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY     Out of memory
- * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR Database error occurred
  * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
+ * @retval #PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE   No such package
  */
 int package_manager_get_package_info(const char *package_id, package_info_h *package_info);
 
@@ -465,7 +495,6 @@ int package_manager_get_package_info(const char *package_id, package_info_h *pac
  *
  * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
  * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
- * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY     Out of memory
  * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR          Database error occurred
  */
 int package_manager_compare_package_cert_info(const char *lhs_package_id, const char *rhs_package_id, package_manager_compare_result_type_e *compare_result);
@@ -484,7 +513,6 @@ int package_manager_compare_package_cert_info(const char *lhs_package_id, const 
  *
  * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
  * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
- * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY     Out of memory
  * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR          Database error occurred
  */
 int package_manager_compare_app_cert_info(const char *lhs_app_id, const char *rhs_app_id, package_manager_compare_result_type_e *compare_result);
@@ -501,9 +529,7 @@ int package_manager_compare_app_cert_info(const char *lhs_app_id, const char *rh
  *         otherwise a negative error value
  *
  * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
- * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
- * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY     Out of memory
- * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR          I/O error
+ * @retval #PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE   No such package
  * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
  */
 int package_manager_is_preload_package_by_app_id(const char *app_id, bool *preload);
@@ -520,9 +546,7 @@ int package_manager_is_preload_package_by_app_id(const char *app_id, bool *prelo
  *         otherwise a negative error value
  *
  * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
- * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
- * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY     Out of memory
- * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR          I/O error
+ * @retval #PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE   No such package
  * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
  */
 int package_manager_get_permission_type(const char *app_id, package_manager_permission_type_e *permission_type);
@@ -662,6 +686,8 @@ int package_manager_get_total_package_size_info(package_manager_total_size_info_
  *
  * @retval #PACKAGE_MANAGER_ERROR_NONE Successful
  * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY Out of memory
+ * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
  * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR I/O error
  * @post package_manager_filter_destroy()
  * @see package_manager_filter_add_bool()
@@ -723,6 +749,7 @@ int package_manager_filter_add_bool(package_manager_filter_h handle,
  *
  * @retval #PACKAGE_MANAGER_ERROR_NONE Successful
  * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
  * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR I/O error
  * @pre package_manager_filter_create()
  * @post package_manager_filter_destroy()
@@ -745,6 +772,7 @@ int package_manager_filter_count(package_manager_filter_h handle, int *count);
  *
  * @retval #PACKAGE_MANAGER_ERROR_NONE Successful
  * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
+ * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
  * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR I/O error
  * @pre package_manager_filter_create()
  * @post package_manager_filter_destroy()
@@ -768,7 +796,6 @@ int package_manager_filter_foreach_package_info(package_manager_filter_h handle,
  * @return 0 on success, otherwise a negative error value
  * @retval #PACKAGE_MANAGER_ERROR_NONE Successful
  * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
- * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY Out of memory
  * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR Internal I/O error
  * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
  * @post package_manager_drm_register_license
@@ -922,10 +949,6 @@ int package_size_info_get_external_app_size(package_size_info_h handle, long lon
 typedef enum {
 	PACKAGE_MANAGER_REQUEST_MODE_DEFAULT = 0,    /**< @platform Default request mode */
 	PACKAGE_MANAGER_REQUEST_MODE_QUIET,          /**< @platform Quiet request mode */
-
-	/* These enum will be deprecated. Use above enum instead. */
-	PACAKGE_MANAGER_REQUEST_MODE_DEFAULT = 0,
-	PACAKGE_MANAGER_REQUEST_MODE_QUIET,
 } package_manager_request_mode_e;
 
 /**
@@ -978,7 +1001,6 @@ typedef void (*package_manager_request_event_cb) (
  * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
  * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
  * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY     Out of memory
- * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR          Internal I/O error
  *
  * @see package_manager_request_destroy()
  */
@@ -1110,6 +1132,10 @@ int package_manager_request_set_tep(package_manager_request_h request,
  * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
  * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
  * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
+ * @retval #PACKAGE_MANAGER_ERROR_SYSTEM_ERROR		 Severe system error
+ * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR Internal I/O error
+ * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY     Out of memory
+ * @retval #PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE   No such package
  * @see package_manager_request_uninstall()
  */
 int package_manager_request_install(package_manager_request_h request,
@@ -1131,6 +1157,10 @@ int package_manager_request_install(package_manager_request_h request,
  * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
  * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
  * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
+ * @retval #PACKAGE_MANAGER_ERROR_SYSTEM_ERROR		 Severe system error
+ * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR Internal I/O error
+ * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY     Out of memory
+ * @retval #PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE   No such package
  */
 int package_manager_request_uninstall(package_manager_request_h request,
                       const char *name, int *id);
@@ -1151,6 +1181,10 @@ int package_manager_request_uninstall(package_manager_request_h request,
  * @retval #PACKAGE_MANAGER_ERROR_NONE              Successful
  * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
  * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
+ * @retval #PACKAGE_MANAGER_ERROR_SYSTEM_ERROR		 Severe system error
+ * @retval #PACKAGE_MANAGER_ERROR_IO_ERROR Internal I/O error
+ * @retval #PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY     Out of memory
+ * @retval #PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE   No such package
  */
 int package_manager_request_move(package_manager_request_h request,
                     const char *name, package_manager_move_type_e move_type);
