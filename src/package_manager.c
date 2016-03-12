@@ -1188,9 +1188,15 @@ API int package_manager_clear_all_cache_dir(void)
 	return package_manager_clear_cache_dir(PKG_CLEAR_ALL_CACHE);
 }
 
+static void __free_client(gpointer data)
+{
+	pkgmgr_client *pc = (pkgmgr_client *)data;
+	pkgmgr_client_free(pc);
+}
+
 static void __initialize_cb_table(void)
 {
-	__cb_table = g_hash_table_new_full(g_int_hash, g_int_equal, pkgmgr_client_free, NULL);
+	__cb_table = g_hash_table_new_full(g_int_hash, g_int_equal, __free_client, NULL);
 }
 
 static void __result_cb(pkgmgr_client *pc, const char *pkgid, const pkg_size_info_t *result, void *user_data)
@@ -1210,7 +1216,7 @@ static void __result_cb(pkgmgr_client *pc, const char *pkgid, const pkg_size_inf
 	size_info.external_cache_size = result->ext_cache_size;
 	size_info.external_app_size   = result->ext_app_size;
 
-	callback(pkgid, &size_info, user_data);
+	callback(pkgid, (package_size_info_h)&size_info, user_data);
 
 	g_hash_table_remove(__cb_table, pc);
 }
@@ -1232,7 +1238,7 @@ static void __total_result_cb(pkgmgr_client *pc, const pkg_size_info_t *result, 
 	size_info.external_cache_size = result->ext_cache_size;
 	size_info.external_app_size   = result->ext_app_size;
 
-	callback(&size_info, user_data);
+	callback((package_size_info_h)&size_info, user_data);
 
 	g_hash_table_remove(__cb_table, pc);
 }
@@ -1250,10 +1256,7 @@ API int package_manager_get_package_size_info(const char *package_id, package_ma
 		return package_manager_error(PACKAGE_MANAGER_ERROR_SYSTEM_ERROR, __FUNCTION__, NULL);
 
 	int res = 0;
-	if (strcmp(package_id, PKG_SIZE_INFO_TOTAL) != 0)
-		res = pkgmgr_client_usr_get_package_size_info(pc, package_id, __result_cb, user_data, getuid());
-	else
-		res = pkgmgr_client_usr_get_total_package_size_info(pc, __total_result_cb, user_data, getuid());
+	res = pkgmgr_client_usr_get_package_size_info(pc, package_id, __result_cb, user_data, getuid());
 
 	if (res == PKGMGR_R_EINVAL) {
 		pkgmgr_client_free(pc);
@@ -1287,7 +1290,47 @@ API int package_manager_get_package_size_info(const char *package_id, package_ma
 
 API int package_manager_get_total_package_size_info(package_manager_total_size_info_receive_cb callback, void *user_data)
 {
-	return package_manager_get_package_size_info(PKG_SIZE_INFO_TOTAL, callback, user_data);
+	if (callback == NULL)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
+
+	if (__cb_table == NULL)
+	__initialize_cb_table();
+
+	pkgmgr_client *pc = pkgmgr_client_new(PC_REQUEST);
+	if (pc == NULL)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_SYSTEM_ERROR, __FUNCTION__, NULL);
+
+	int res = 0;
+	res = pkgmgr_client_usr_get_total_package_size_info(pc, __total_result_cb, user_data, getuid());
+
+	if (res == PKGMGR_R_EINVAL) {
+		pkgmgr_client_free(pc);
+		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
+	} else if (res == PKGMGR_R_ENOPKG) {
+		pkgmgr_client_free(pc);
+		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
+	} else if (res == PKGMGR_R_ENOMEM) {
+		pkgmgr_client_free(pc);
+		return package_manager_error(PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY, __FUNCTION__, NULL);
+	} else if (res == PKGMGR_R_EIO) {
+		pkgmgr_client_free(pc);
+		return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
+	} else if (res == PKGMGR_R_EPRIV) {
+		pkgmgr_client_free(pc);
+		return package_manager_error(PACKAGE_MANAGER_ERROR_PERMISSION_DENIED, __FUNCTION__, NULL);
+	} else if (res == PKGMGR_R_ESYSTEM || res == PKGMGR_R_ECOMM || res == PKGMGR_R_ERROR) {
+		pkgmgr_client_free(pc);
+		return package_manager_error(PACKAGE_MANAGER_ERROR_SYSTEM_ERROR, __FUNCTION__, NULL);
+	} else if (res != PKGMGR_R_OK) {
+		_LOGE("Unexpected error");
+		pkgmgr_client_free(pc);
+		return package_manager_error(PACKAGE_MANAGER_ERROR_SYSTEM_ERROR, __FUNCTION__, NULL);
+	}
+
+	g_hash_table_insert(__cb_table, pc, callback);
+
+	_LOGD("Successful");
+	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
 API int package_manager_filter_create(package_manager_filter_h *handle)

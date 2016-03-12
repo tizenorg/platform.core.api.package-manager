@@ -449,7 +449,7 @@ API int package_info_foreach_privilege_info(package_info_h package_info, package
 	if (package_info == NULL || callback == NULL)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 
-	ret = pkgmgrinfo_pkginfo_foreach_privilege(package_info->pkgmgr_pkginfo, callback, user_data);
+	ret = pkgmgrinfo_pkginfo_foreach_privilege(package_info->pkgmgr_pkginfo, (pkgmgrinfo_pkg_privilege_list_cb)callback, user_data);
 
 	return ret;
 }
