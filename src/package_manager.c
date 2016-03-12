@@ -1188,9 +1188,15 @@ API int package_manager_clear_all_cache_dir(void)
 	return package_manager_clear_cache_dir(PKG_CLEAR_ALL_CACHE);
 }
 
+static void __free_client(gpointer data)
+{
+	pkgmgr_client *pc = (pkgmgr_client *)data;
+	pkgmgr_client_free(pc);
+}
+
 static void __initialize_cb_table(void)
 {
-	__cb_table = g_hash_table_new_full(g_int_hash, g_int_equal, pkgmgr_client_free, NULL);
+	__cb_table = g_hash_table_new_full(g_int_hash, g_int_equal, __free_client, NULL);
 }
 
 static void __result_cb(pkgmgr_client *pc, const char *pkgid, const pkg_size_info_t *result, void *user_data)
@@ -1210,7 +1216,7 @@ static void __result_cb(pkgmgr_client *pc, const char *pkgid, const pkg_size_inf
 	size_info.external_cache_size = result->ext_cache_size;
 	size_info.external_app_size   = result->ext_app_size;
 
-	callback(pkgid, &size_info, user_data);
+	callback(pkgid, (package_size_info_h)&size_info, user_data);
 
 	g_hash_table_remove(__cb_table, pc);
 }
@@ -1232,12 +1238,12 @@ static void __total_result_cb(pkgmgr_client *pc, const pkg_size_info_t *result, 
 	size_info.external_cache_size = result->ext_cache_size;
 	size_info.external_app_size   = result->ext_app_size;
 
-	callback(&size_info, user_data);
+	callback((package_size_info_h)&size_info, user_data);
 
 	g_hash_table_remove(__cb_table, pc);
 }
 
-API int package_manager_get_package_size_info(const char *package_id, package_manager_size_info_receive_cb callback, void *user_data)
+static int _get_pkg_size_info(const char *package_id, void *callback, void *user_data)
 {
 	if (package_id == NULL || callback == NULL)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
@@ -1285,9 +1291,14 @@ API int package_manager_get_package_size_info(const char *package_id, package_ma
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
+API int package_manager_get_package_size_info(const char *package_id, package_manager_size_info_receive_cb callback, void *user_data)
+{
+	return _get_pkg_size_info(package_id, (void *)callback, user_data);
+}
+
 API int package_manager_get_total_package_size_info(package_manager_total_size_info_receive_cb callback, void *user_data)
 {
-	return package_manager_get_package_size_info(PKG_SIZE_INFO_TOTAL, callback, user_data);
+	return _get_pkg_size_info(PKG_SIZE_INFO_TOTAL, (void *)callback, user_data);
 }
 
 API int package_manager_filter_create(package_manager_filter_h *handle)
