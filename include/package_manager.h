@@ -532,7 +532,7 @@ int package_manager_get_permission_type(const char *app_id, package_manager_perm
  * @details All files stored in the cache directory of the application specified with the
  *          package ID are removed.
  *
- * @since_tizen 2.4
+ * @since_tizen @if MOBILE 2.4 @elseif WEARABLE 3.0 @endif
  * @privlevel public
  * @privilege %http://tizen.org/privilege/packagemanager.clearcache
  *
@@ -575,13 +575,13 @@ int package_manager_clear_all_cache_dir(void);
 
 /**
  * @brief  The handle for the package size information.
- * @since_tizen 2.4
+ * @since_tizen @if MOBILE 2.4 @elseif WEARABLE 3.0 @endif
  */
 typedef struct package_size_info_t *package_size_info_h;
 
 /**
  * @brief  Called when the package size information is obtained.
- * @since_tizen 2.4
+ * @since_tizen @if MOBILE 2.4 @elseif WEARABLE 3.0 @endif
  *
  * @param[in]  package_id  The package ID
  * @param[in]  size_info   The pointer to the structure including the package size information
@@ -605,7 +605,7 @@ typedef void (*package_manager_total_size_info_receive_cb)(const package_size_in
  * @privlevel public
  * @privilege %http://tizen.org/privilege/packagemanager.info
  *
- * @since_tizen 2.4
+ * @since_tizen @if MOBILE 2.4 @elseif WEARABLE 3.0 @endif
  *
  * @param[in]  package_id  The package ID
  * @param[in]  callback    The asynchronous callback function to get the package size information
@@ -758,7 +758,7 @@ int package_manager_filter_foreach_package_info(package_manager_filter_h handle,
 /**
  * @platform
  * @brief Generates request for getting License
- * @since_tizen 2.4
+ * @since_tizen @if MOBILE 2.4 @elseif WEARABLE 3.0 @endif
  * @privlevel platform
  * @privilege %http://tizen.org/privilege/packagemanager.admin
  * @param[in] resp_data The response data string of the purchase request
@@ -778,7 +778,7 @@ int package_manager_drm_generate_license_request(const char *resp_data, char **r
 /**
  * @platform
  * @brief Registers encrypted license
- * @since_tizen 2.4
+ * @since_tizen @if MOBILE 2.4 @elseif WEARABLE 3.0 @endif
  * @privlevel platform
  * @privilege %http://tizen.org/privilege/packagemanager.admin
  * @param[in] resp_data The response data string of the rights request
@@ -794,7 +794,7 @@ int package_manager_drm_register_license(const char *resp_data);
 /**
  * @platform
  * @brief Decrypts contents which is encrypted
- * @since_tizen 2.4
+ * @since_tizen @if MOBILE 2.4 @elseif WEARABLE 3.0 @endif
  * @privlevel platform
  * @privilege %http://tizen.org/privilege/packagemanager.admin
  * @param[in] drm_file_path DRM file path
@@ -810,7 +810,7 @@ int package_manager_drm_decrypt_package(const char *drm_file_path, const char *d
 /**
  * @brief  Retrieves data size from given handle
  *
- * @since_tizen 2.4
+ * @since_tizen @if MOBILE 2.4 @elseif WEARABLE 3.0 @endif
  *
  * @param[in] handle  Package size info handle
  * @param[out] data_size  Data size will be returned
@@ -826,7 +826,7 @@ int package_size_info_get_data_size(package_size_info_h handle, long long *data_
 /**
  * @brief  Retrieves cache size from given handle
  *
- * @since_tizen 2.4
+ * @since_tizen @if MOBILE 2.4 @elseif WEARABLE 3.0 @endif
  *
  * @param[in] handle  Package size info handle
  * @param[out] cache_size  Cache size will be returned
@@ -842,7 +842,7 @@ int package_size_info_get_cache_size(package_size_info_h handle, long long *cach
 /**
  * @brief  Retrieves application size from given handle
  *
- * @since_tizen 2.4
+ * @since_tizen @if MOBILE 2.4 @elseif WEARABLE 3.0 @endif
  *
  * @param[in] handle  Package size info handle
  * @param[out] app_size  App size will be returned
@@ -858,7 +858,7 @@ int package_size_info_get_app_size(package_size_info_h handle, long long *app_si
 /**
  * @brief  Retrieves external data size from given handle
  *
- * @since_tizen 2.4
+ * @since_tizen @if MOBILE 2.4 @elseif WEARABLE 3.0 @endif
  *
  * @param[in] handle  Package size info handle
  * @param[out] ext_data_size  External data size will be returned
@@ -875,7 +875,7 @@ int package_size_info_get_external_data_size(package_size_info_h handle, long lo
 /**
  * @brief  Retrieves external cache size from given handle
  *
- * @since_tizen 2.4
+ * @since_tizen @if MOBILE 2.4 @elseif WEARABLE 3.0 @endif
  *
  * @param[in] handle  Package size info handle
  * @param[out] ext_cache_size  External cache size will be returned
@@ -892,7 +892,7 @@ int package_size_info_get_external_cache_size(package_size_info_h handle, long l
 /**
  * @brief  Retrieves external application size from given handle
  *
- * @since_tizen 2.4
+ * @since_tizen @if MOBILE 2.4 @elseif WEARABLE 3.0 @endif
  *
  * @param[in] handle  Package size info handle
  * @param[out] ext_app_size  External app size will be returned
@@ -1080,7 +1080,7 @@ int package_manager_request_set_mode(package_manager_request_h request,
 /**
  * @platform
  * @brief Sets the path of TEP file to the request. The TEP file that is set will be installed when the package is installed.
- * @since_tizen 2.4
+ * @since_tizen @if MOBILE 2.4 @elseif WEARABLE 3.0 @endif
  * @privlevel platform
  * @privilege %http://tizen.org/privilege/packagemanager.admin
  * @param[in] request The request handle

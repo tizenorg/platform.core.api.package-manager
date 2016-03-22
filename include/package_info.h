@@ -295,7 +295,7 @@ int package_info_get_root_path(package_info_h package_info, char **path);
 /**
  * @platform
  * @brief Gets the name of the TEP(Tizen Expansion Package).
- * @since_tizen 2.4
+ * @since_tizen @if MOBILE 2.4 @elseif WEARABLE 3.0 @endif
  * @privlevel platform
  * @privilege %http://tizen.org/privilege/packagemanager.admin
  * @remarks name must be released using free().
