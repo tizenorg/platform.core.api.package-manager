@@ -731,12 +731,16 @@ static int global_event_handler(uid_t target_uid, int req_id, const char *pkg_ty
 	int ret = -1;
 	package_manager_event_type_e event_type = -1;
 	package_manager_event_state_e event_state = -1;
+	uid_t uid = target_uid;
 
 	_LOGD("global_event_handler is called");
 
 	package_manager_h manager = data;
 
-	if (__validate_event_signal(target_uid))
+	if (target_uid == GLOBAL_USER)
+		uid = getuid();
+
+	if (__validate_event_signal(uid))
 		return PACKAGE_MANAGER_ERROR_NONE;
 
 	if (strcasecmp(key, "start") == 0) {
@@ -747,7 +751,7 @@ static int global_event_handler(uid_t target_uid, int req_id, const char *pkg_ty
 		__add_event(&(manager->head), req_id, event_type,
 				 PACKAGE_MANAGER_EVENT_STATE_STARTED);
 
-		if (manager->event_cb && getuid() == target_uid)
+		if (manager->event_cb && getuid() == uid)
 			manager->event_cb(pkg_type, pkg_name,
 					  event_type,
 					  PACKAGE_MANAGER_EVENT_STATE_STARTED,
@@ -766,7 +770,7 @@ static int global_event_handler(uid_t target_uid, int req_id, const char *pkg_ty
 			__update_event(&(manager->head), req_id,
 					    event_type,
 					    PACKAGE_MANAGER_EVENT_STATE_PROCESSING);
-			if (manager->event_cb && getuid() == target_uid)
+			if (manager->event_cb && getuid() == uid)
 				manager->event_cb(pkg_type, pkg_name,
 						  event_type,
 						  PACKAGE_MANAGER_EVENT_STATE_PROCESSING,
@@ -792,7 +796,7 @@ static int global_event_handler(uid_t target_uid, int req_id, const char *pkg_ty
 						    PACKAGE_MANAGER_EVENT_STATE_FAILED);
 			}
 
-			if (manager->event_cb && getuid() == target_uid)
+			if (manager->event_cb && getuid() == uid)
 				manager->event_cb(pkg_type,
 						  pkg_name, event_type,
 						  PACKAGE_MANAGER_EVENT_STATE_FAILED,
@@ -812,7 +816,7 @@ static int global_event_handler(uid_t target_uid, int req_id, const char *pkg_ty
 		    (&(manager->head), req_id, &event_type,
 		     &event_state) == 0) {
 			if (event_state != PACKAGE_MANAGER_EVENT_STATE_FAILED) {
-				if (manager->event_cb && getuid() == target_uid)
+				if (manager->event_cb && getuid() == uid)
 					manager->event_cb(pkg_type,
 							  pkg_name, event_type,
 							  PACKAGE_MANAGER_EVENT_STATE_COMPLETED,
@@ -829,7 +833,7 @@ static int global_event_handler(uid_t target_uid, int req_id, const char *pkg_ty
 			}
 		} else {
 			if (strcasecmp(key, "ok") != 0) {
-				if (manager->event_cb && getuid() == target_uid)
+				if (manager->event_cb && getuid() == uid)
 					manager->event_cb(pkg_type,
 							  pkg_name, event_type,
 							  PACKAGE_MANAGER_EVENT_STATE_FAILED,
