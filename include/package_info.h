@@ -308,7 +308,7 @@ int package_info_get_root_path(package_info_h package_info, char **path);
  * @retval #PACKAGE_MANAGER_ERROR_SYSTEM_ERROR		 Severe system error
  * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
  */
-int package_info_get_tep_name (package_info_h package_info, char **name);
+int package_info_get_tep_name(package_info_h package_info, char **name);
 
 /**
  * @brief Checks whether the package is system package.

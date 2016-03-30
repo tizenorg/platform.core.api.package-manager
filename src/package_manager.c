@@ -61,8 +61,7 @@ struct package_manager_request_s {
 	void *user_data;
 };
 
-typedef struct package_size_info
-{
+typedef struct package_size_info {
     long long data_size;
     long long cache_size;
     long long app_size;

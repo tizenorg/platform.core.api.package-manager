@@ -31,7 +31,7 @@
 
 #define LOG_TAG "CAPI_APPFW_PACKAGE_MANAGER"
 
-#define _LOGE(fmt, arg...) LOGE(fmt,##arg)
+#define _LOGE(fmt, arg...) LOGE(fmt, ##arg)
 #define _LOGD(fmt, arg...) LOGD(fmt, ##arg)
 
 #ifdef __cplusplus
