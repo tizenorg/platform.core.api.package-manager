@@ -142,7 +142,7 @@ static int _listen_event(void)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
 	GMainLoop *loop;
 	int ret = PACKAGE_MANAGER_ERROR_NONE;

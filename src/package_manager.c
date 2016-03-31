@@ -61,15 +61,14 @@ struct package_manager_request_s {
 	void *user_data;
 };
 
-typedef struct package_size_info
-{
-    long long data_size;
-    long long cache_size;
-    long long app_size;
+typedef struct package_size_info {
+	long long data_size;
+	long long cache_size;
+	long long app_size;
 
-    long long external_data_size;
-    long long external_cache_size;
-    long long external_app_size;
+	long long external_data_size;
+	long long external_cache_size;
+	long long external_app_size;
 } package_size_info_t;
 
 struct package_manager_filter_s {
@@ -235,7 +234,7 @@ static int package_manager_get_event_type(const char *key,
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-static int __add_event_info(event_info ** head, int req_id,
+static int __add_event_info(event_info **head, int req_id,
 			    package_manager_event_type_e event_type,
 			    package_manager_event_state_e event_state)
 {
@@ -267,9 +266,9 @@ static int __add_event_info(event_info ** head, int req_id,
 	return 0;
 }
 
-static int __find_event_info(event_info ** head, int req_id,
-			     package_manager_event_type_e * event_type,
-			     package_manager_event_state_e * event_state)
+static int __find_event_info(event_info **head, int req_id,
+			     package_manager_event_type_e *event_type,
+			     package_manager_event_state_e *event_state)
 {
 	event_info *tmp;
 
@@ -292,7 +291,7 @@ static int __find_event_info(event_info ** head, int req_id,
 	return -1;
 }
 
-static int __update_event_info(event_info ** head, int req_id,
+static int __update_event_info(event_info **head, int req_id,
 			       package_manager_event_type_e event_type,
 			       package_manager_event_state_e event_state)
 {
@@ -571,7 +570,7 @@ API int package_manager_request_move(package_manager_request_h request,
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-API int package_manager_create(package_manager_h * manager)
+API int package_manager_create(package_manager_h *manager)
 {
 
 	int retval;
@@ -637,7 +636,7 @@ API int package_manager_destroy(package_manager_h manager)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-static int __add_event(event_info ** head, int req_id,
+static int __add_event(event_info **head, int req_id,
 			    package_manager_event_type_e event_type,
 			    package_manager_event_state_e event_state)
 {
@@ -657,9 +656,9 @@ static int __add_event(event_info ** head, int req_id,
 	return 0;
 }
 
-static int __find_event(event_info ** head, int req_id,
-			     package_manager_event_type_e * event_type,
-			     package_manager_event_state_e * event_state)
+static int __find_event(event_info **head, int req_id,
+			     package_manager_event_type_e *event_type,
+			     package_manager_event_state_e *event_state)
 {
 	event_info *tmp;
 
@@ -674,7 +673,7 @@ static int __find_event(event_info ** head, int req_id,
 	return 0;
 }
 
-static int __update_event(event_info ** head, int req_id,
+static int __update_event(event_info **head, int req_id,
 			       package_manager_event_type_e event_type,
 			       package_manager_event_state_e event_state)
 {

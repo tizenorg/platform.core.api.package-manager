@@ -198,13 +198,13 @@ typedef struct package_manager_filter_s *package_manager_filter_h;
  * @see package_manager_unset_event_cb()
  */
 typedef void (*package_manager_event_cb) (
-            const char *type,
-            const char *package,
-            package_manager_event_type_e event_type,
-            package_manager_event_state_e event_state,
-            int progress,
-            package_manager_error_e error,
-            void *user_data);
+		const char *type,
+		const char *package,
+		package_manager_event_type_e event_type,
+		package_manager_event_state_e event_state,
+		int progress,
+		package_manager_error_e error,
+		void *user_data);
 
 /**
  * @brief Called when the package is installed, uninstalled or updated, and the progress of the request to the package manager changes.
@@ -224,14 +224,14 @@ typedef void (*package_manager_event_cb) (
  * @see package_manager_unset_global_event_cb()
  */
 typedef void (*package_manager_global_event_cb) (
-            uid_t target_uid,
-            const char *type,
-            const char *package,
-            package_manager_event_type_e event_type,
-            package_manager_event_state_e event_state,
-            int progress,
-            package_manager_error_e error,
-            void *user_data);
+		uid_t target_uid,
+		const char *type,
+		const char *package,
+		package_manager_event_type_e event_type,
+		package_manager_event_state_e event_state,
+		int progress,
+		package_manager_error_e error,
+		void *user_data);
 
 /**
  * @brief Creates a package manager handle.
@@ -252,7 +252,7 @@ typedef void (*package_manager_global_event_cb) (
  * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
  * @see package_manager_destroy()
  */
-int package_manager_create(package_manager_h * manager);
+int package_manager_create(package_manager_h *manager);
 
 /**
  * @brief Destroys the package manager handle.
@@ -312,8 +312,8 @@ int package_manager_set_event_status(package_manager_h manager, int status_type)
  * @see package_manager_unset_event_cb()
  */
 int package_manager_set_event_cb(package_manager_h manager,
-                 package_manager_event_cb callback,
-                 void *user_data);
+		package_manager_event_cb callback,
+		void *user_data);
 
 /**
  * @brief Unregisters the callback function.
@@ -354,8 +354,8 @@ int package_manager_unset_event_cb(package_manager_h manager);
  * @see package_manager_unset_global_event_cb()
  */
 int package_manager_set_global_event_cb(package_manager_h manager,
-                 package_manager_global_event_cb callback,
-                 void *user_data);
+		package_manager_global_event_cb callback,
+		void *user_data);
 
 /**
  * @brief Unregisters the callback function.
@@ -387,8 +387,8 @@ int package_manager_unset_global_event_cb(package_manager_h manager);
  * @see package_manager_foreach_package_info()
  */
 typedef bool (*package_manager_package_info_cb) (
-            package_info_h package_info,
-            void *user_data);
+		package_info_h package_info,
+		void *user_data);
 
 /**
  * @brief Retrieves all package information of installed packages.
@@ -409,7 +409,7 @@ typedef bool (*package_manager_package_info_cb) (
  * @see package_manager_package_info_cb()
  */
 int package_manager_foreach_package_info(package_manager_package_info_cb callback,
-                    void *user_data);
+		void *user_data);
 
 /**
  * @brief Gets the package ID for the given app ID.
@@ -954,14 +954,14 @@ typedef struct package_manager_request_s *package_manager_request_h;
  * @see package_manager_request_unset_event_cb()
  */
 typedef void (*package_manager_request_event_cb) (
-            int id,
-            const char *type,
-            const char *package,
-            package_manager_event_type_e event_type,
-            package_manager_event_state_e event_state,
-            int progress,
-            package_manager_error_e error,
-            void *user_data);
+		int id,
+		const char *type,
+		const char *package,
+		package_manager_event_type_e event_type,
+		package_manager_event_state_e event_state,
+		int progress,
+		package_manager_error_e error,
+		void *user_data);
 
 /**
  * @platform
@@ -1023,7 +1023,7 @@ int package_manager_request_destroy(package_manager_request_h request);
  * @see package_manager_request_unset_event_cb()
  */
 int package_manager_request_set_event_cb(package_manager_request_h request,
-                     package_manager_request_event_cb callback, void *user_data);
+		package_manager_request_event_cb callback, void *user_data);
 
 /**
  * @platform
@@ -1058,7 +1058,7 @@ int package_manager_request_unset_event_cb(package_manager_request_h request);
  * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
  */
 int package_manager_request_set_type(package_manager_request_h request,
-                     const char *type);
+		const char *type);
 
 /**
  * @platform
@@ -1075,7 +1075,7 @@ int package_manager_request_set_type(package_manager_request_h request,
  * @retval #PACKAGE_MANAGER_ERROR_INVALID_PARAMETER Invalid parameter
  */
 int package_manager_request_set_mode(package_manager_request_h request,
-                     package_manager_request_mode_e mode);
+		package_manager_request_mode_e mode);
 
 /**
  * @platform
@@ -1092,7 +1092,7 @@ int package_manager_request_set_mode(package_manager_request_h request,
  * @retval #PACKAGE_MANAGER_ERROR_SYSTEM_ERROR		 Severe system error
  */
 int package_manager_request_set_tep(package_manager_request_h request,
-                     const char *tep_path);
+		const char *tep_path);
 
 /**
  * @platform
@@ -1113,7 +1113,7 @@ int package_manager_request_set_tep(package_manager_request_h request,
  * @see package_manager_request_uninstall()
  */
 int package_manager_request_install(package_manager_request_h request,
-                    const char *path, int *id);
+		const char *path, int *id);
 
 /**
  * @platform
@@ -1133,7 +1133,7 @@ int package_manager_request_install(package_manager_request_h request,
  * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
  */
 int package_manager_request_uninstall(package_manager_request_h request,
-                      const char *name, int *id);
+		const char *name, int *id);
 
 /**
  * @platform
@@ -1153,7 +1153,7 @@ int package_manager_request_uninstall(package_manager_request_h request,
  * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
  */
 int package_manager_request_move(package_manager_request_h request,
-                    const char *name, package_manager_move_type_e move_type);
+		const char *name, package_manager_move_type_e move_type);
 
 /**
 * @}

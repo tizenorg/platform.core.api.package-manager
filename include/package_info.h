@@ -37,15 +37,15 @@ extern "C" {
  * @brief The package information handle.
  * @since_tizen 2.3
  */
- typedef struct package_info_s *package_info_h;
+typedef struct package_info_s *package_info_h;
 
 /**
  * @brief Enumeration for storage type.
  * @since_tizen 2.3
  */
 typedef enum {
-    PACKAGE_INFO_INTERNAL_STORAGE = 0,    /**< Internal storage */
-    PACKAGE_INFO_EXTERNAL_STORAGE = 1,    /**< External storage */
+	PACKAGE_INFO_INTERNAL_STORAGE = 0,    /**< Internal storage */
+	PACKAGE_INFO_EXTERNAL_STORAGE = 1,    /**< External storage */
 } package_info_installed_storage_type_e;
 
 /**
@@ -53,9 +53,9 @@ typedef enum {
  * @since_tizen 2.3
  */
 typedef enum {
-    PACKAGE_INFO_ALLAPP = 0,        /**< All application */
-    PACKAGE_INFO_UIAPP = 1,         /**< UI application */
-    PACKAGE_INFO_SERVICEAPP = 2,    /**< Service application */
+	PACKAGE_INFO_ALLAPP = 0,        /**< All application */
+	PACKAGE_INFO_UIAPP = 1,         /**< UI application */
+	PACKAGE_INFO_SERVICEAPP = 2,    /**< Service application */
 } package_info_app_component_type_e;
 
 /**
@@ -63,15 +63,15 @@ typedef enum {
  * @since_tizen 2.3
  */
 typedef enum {
-    PACKAGE_INFO_AUTHOR_ROOT_CERT = 0,               /**< Author Root Certificate*/
-    PACKAGE_INFO_AUTHOR_INTERMEDIATE_CERT = 1,       /**< Author Intermediate Certificate*/
-    PACKAGE_INFO_AUTHOR_SIGNER_CERT = 2,             /**< Author Signer Certificate*/
-    PACKAGE_INFO_DISTRIBUTOR_ROOT_CERT = 3,          /**< Distributor Root Certificate*/
-    PACKAGE_INFO_DISTRIBUTOR_INTERMEDIATE_CERT = 4,  /**< Distributor Intermediate Certificate*/
-    PACKAGE_INFO_DISTRIBUTOR_SIGNER_CERT = 5,        /**< Distributor Signer Certificate*/
-    PACKAGE_INFO_DISTRIBUTOR2_ROOT_CERT = 6,         /**< Distributor2 Root Certificate*/
-    PACKAGE_INFO_DISTRIBUTOR2_INTERMEDIATE_CERT = 7, /**< Distributor2 Intermediate Certificate*/
-    PACKAGE_INFO_DISTRIBUTOR2_SIGNER_CERT = 8,       /**< Distributor2 Signer Certificate*/
+	PACKAGE_INFO_AUTHOR_ROOT_CERT = 0,               /**< Author Root Certificate*/
+	PACKAGE_INFO_AUTHOR_INTERMEDIATE_CERT = 1,       /**< Author Intermediate Certificate*/
+	PACKAGE_INFO_AUTHOR_SIGNER_CERT = 2,             /**< Author Signer Certificate*/
+	PACKAGE_INFO_DISTRIBUTOR_ROOT_CERT = 3,          /**< Distributor Root Certificate*/
+	PACKAGE_INFO_DISTRIBUTOR_INTERMEDIATE_CERT = 4,  /**< Distributor Intermediate Certificate*/
+	PACKAGE_INFO_DISTRIBUTOR_SIGNER_CERT = 5,        /**< Distributor Signer Certificate*/
+	PACKAGE_INFO_DISTRIBUTOR2_ROOT_CERT = 6,         /**< Distributor2 Root Certificate*/
+	PACKAGE_INFO_DISTRIBUTOR2_INTERMEDIATE_CERT = 7, /**< Distributor2 Intermediate Certificate*/
+	PACKAGE_INFO_DISTRIBUTOR2_SIGNER_CERT = 8,       /**< Distributor2 Signer Certificate*/
 } package_cert_type_e;
 
 /**
@@ -308,7 +308,7 @@ int package_info_get_root_path(package_info_h package_info, char **path);
  * @retval #PACKAGE_MANAGER_ERROR_SYSTEM_ERROR		 Severe system error
  * @retval #PACKAGE_MANAGER_ERROR_PERMISSION_DENIED Permission denied
  */
-int package_info_get_tep_name (package_info_h package_info, char **name);
+int package_info_get_tep_name(package_info_h package_info, char **name);
 
 /**
  * @brief Checks whether the package is system package.

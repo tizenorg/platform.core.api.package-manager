@@ -31,7 +31,7 @@
 
 #define LOG_TAG "CAPI_APPFW_PACKAGE_MANAGER"
 
-#define _LOGE(fmt, arg...) LOGE(fmt,##arg)
+#define _LOGE(fmt, arg...) LOGE(fmt, ##arg)
 #define _LOGD(fmt, arg...) LOGD(fmt, ##arg)
 
 #ifdef __cplusplus
@@ -46,7 +46,7 @@ typedef enum {
 
 int check_privilege(privilege_type type);
 
-int package_manager_error(package_manager_error_e error, const char* function, const char *description);
+int package_manager_error(package_manager_error_e error, const char *function, const char *description);
 
 int package_info_get_package_info(const char *package, package_info_h *package_info);
 
