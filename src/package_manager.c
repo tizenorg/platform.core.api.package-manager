@@ -55,9 +55,11 @@ struct package_manager_request_s {
 	const char *pkg_type;
 	const char *pkg_path;
 	const char *pkg_name;
+	const char *tep_path;
 	pkgmgr_mode mode;
 	event_info *head;
 	package_manager_request_event_cb event_cb;
+	bool tep_move;
 	void *user_data;
 };
 
@@ -211,6 +213,34 @@ API int package_manager_request_set_mode(package_manager_request_h request,
 		request->mode = PM_QUIET;
 	else
 		request->mode = PM_DEFAULT;
+
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
+
+int package_manager_request_set_tep(package_manager_request_h request,
+				     const char *tep_path)
+{
+	int retval = 0;
+
+	if (package_manager_client_validate_handle(request) || tep_path == NULL) {
+		return
+			package_manager_error
+			(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
+			 NULL);
+	}
+
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_ADMIN);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE)
+		return retval;
+
+	if (request->tep_path)
+		free((void *)request->tep_path);
+
+	request->tep_path = strdup(tep_path);
+	request->tep_move = true;
+
+	if (request ->tep_path == NULL)
+		return PACKAGE_MANAGER_ERROR_SYSTEM_ERROR;
 
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
