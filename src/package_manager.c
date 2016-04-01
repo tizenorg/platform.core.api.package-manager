@@ -45,6 +45,7 @@ struct package_manager_s {
 	event_info *head;
 	package_manager_event_cb event_cb;
 	package_manager_global_event_cb global_event_cb;
+	void *global_user_data;
 	void *user_data;
 };
 
@@ -178,9 +179,11 @@ API int package_manager_request_unset_event_cb(package_manager_request_h request
 	if (package_manager_client_validate_handle(request))
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 
+	request->event_cb = NULL;
+	request->user_data = NULL;
+
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
-
 
 API int package_manager_request_set_type(package_manager_request_h request,
 				     const char *pkg_type)
@@ -755,7 +758,7 @@ static int global_event_handler(uid_t target_uid, int req_id, const char *pkg_ty
 			manager->global_event_cb(target_uid, pkg_type, pkg_name,
 					  event_type,
 					  PACKAGE_MANAGER_EVENT_STATE_STARTED,
-					  0, PACKAGE_MANAGER_ERROR_NONE, manager->user_data);
+					  0, PACKAGE_MANAGER_ERROR_NONE, manager->global_user_data);
 
 	} else if (strcasecmp(key, "install_percent") == 0
 		   || strcasecmp(key, "progress_percent") == 0) {
@@ -778,7 +781,7 @@ static int global_event_handler(uid_t target_uid, int req_id, const char *pkg_ty
 						  PACKAGE_MANAGER_EVENT_STATE_PROCESSING,
 						  atoi(val),
 						  PACKAGE_MANAGER_ERROR_NONE,
-						  manager->user_data);
+						  manager->global_user_data);
 		}
 
 	} else if (strcasecmp(key, "error") == 0) {
@@ -804,7 +807,7 @@ static int global_event_handler(uid_t target_uid, int req_id, const char *pkg_ty
 						  PACKAGE_MANAGER_EVENT_STATE_FAILED,
 						  0,
 						  PACKAGE_MANAGER_ERROR_NONE,
-						  manager->user_data);
+						  manager->global_user_data);
 		}
 	} else if (strcasecmp(key, "end") == 0) {
 		if (__find_event
@@ -824,7 +827,7 @@ static int global_event_handler(uid_t target_uid, int req_id, const char *pkg_ty
 							  PACKAGE_MANAGER_EVENT_STATE_COMPLETED,
 							  100,
 							  PACKAGE_MANAGER_ERROR_NONE,
-							  manager->user_data);
+							  manager->global_user_data);
 			}
 		} else {
 			if (strcasecmp(key, "ok") != 0) {
@@ -841,7 +844,7 @@ static int global_event_handler(uid_t target_uid, int req_id, const char *pkg_ty
 							  PACKAGE_MANAGER_EVENT_STATE_FAILED,
 							  0,
 							  PACKAGE_MANAGER_ERROR_NONE,
-							  manager->user_data);
+							  manager->global_user_data);
 			}
 		}
 	}
@@ -898,7 +901,24 @@ API int package_manager_unset_event_cb(package_manager_h manager)
 		     NULL);
 	}
 
-	/* TODO: Please implement this function. */
+	int retval;
+	manager->event_cb = NULL;
+	manager->user_data = NULL;
+
+	if (manager->global_event_cb == NULL) {
+		retval = pkgmgr_client_remove_listen_status(manager->pc);
+		if (retval == PKGMGR_R_EINVAL)
+			return
+				 package_manager_error
+				 (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
+				  NULL);
+		else if (retval == PKGMGR_R_ERROR)
+			return
+				 package_manager_error
+				 (PACKAGE_MANAGER_ERROR_SYSTEM_ERROR, __FUNCTION__,
+				  NULL);
+	}
+
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
@@ -925,7 +945,7 @@ API int package_manager_set_global_event_cb(package_manager_h manager,
 	}
 
 	manager->global_event_cb = callback;
-	manager->user_data = user_data;
+	manager->global_user_data = user_data;
 
 	pkgmgr_client_listen_status(manager->pc, global_event_handler, manager);
 
@@ -940,8 +960,24 @@ API int package_manager_unset_global_event_cb(package_manager_h manager)
 		    (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
 		     NULL);
 	}
+	int retval;
+	manager->global_event_cb = NULL;
+	manager->global_user_data = NULL;
 
-	/* TODO: Please implement this function. */
+	if (manager->event_cb == NULL) {
+		retval = pkgmgr_client_remove_listen_status(manager->pc);
+		if (retval == PKGMGR_R_EINVAL)
+			return
+				 package_manager_error
+				 (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
+				  NULL);
+		else if (retval == PKGMGR_R_ERROR)
+			return
+				 package_manager_error
+				 (PACKAGE_MANAGER_ERROR_SYSTEM_ERROR, __FUNCTION__,
+				  NULL);
+	}
+
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
