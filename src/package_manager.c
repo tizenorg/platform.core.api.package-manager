@@ -241,7 +241,7 @@ int package_manager_request_set_tep(package_manager_request_h request,
 	request->tep_path = strdup(tep_path);
 	request->tep_move = true;
 
-	if (request ->tep_path == NULL)
+	if (request->tep_path == NULL)
 		return PACKAGE_MANAGER_ERROR_SYSTEM_ERROR;
 
 	return PACKAGE_MANAGER_ERROR_NONE;
