@@ -581,11 +581,14 @@ API int package_manager_request_move(package_manager_request_h request,
 	request->pkg_name = name;
 	uid_t uid = getuid();
 	if (uid != GLOBAL_USER)
-		ret = pkgmgr_client_usr_move(request->pc, request->pkg_type, request->pkg_name,
-							move_type, request->mode, uid);
+		ret = pkgmgr_client_usr_request_service(PM_REQUEST_MOVE, move_type,
+				request->pc, request->pkg_type, request->pkg_name,
+				uid, NULL, request_event_handler, NULL);
 	else
-		ret = pkgmgr_client_move(request->pc, request->pkg_type, request->pkg_name,
-							move_type, request->mode);
+		ret = pkgmgr_client_request_service(PM_REQUEST_MOVE, move_type,
+				request->pc, request->pkg_type, request->pkg_name,
+				NULL, request_event_handler, NULL);
+
 	if (ret == PKGMGR_R_EINVAL)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	else if (ret == PKGMGR_R_ENOPKG)
