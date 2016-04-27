@@ -309,6 +309,40 @@ END:
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
+API int package_info_get_tep_name (package_info_h package_info, char **name)
+{
+	pkgmgrinfo_pkginfo_h pkginfo;
+	char *tepname_tmp = NULL;
+	int retval = 0;
+
+	if (package_info == NULL || package_info->package == NULL || name == NULL)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
+
+	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_ADMIN);
+	if (retval != PACKAGE_MANAGER_ERROR_NONE) {
+		return retval;
+	}
+
+	if (pkgmgrinfo_pkginfo_get_pkginfo(package_info->package, &pkginfo) != PMINFO_R_OK)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_SYSTEM_ERROR, __FUNCTION__, NULL);
+
+	if (pkginfo == NULL)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_SYSTEM_ERROR, __FUNCTION__, NULL);
+
+	if (pkgmgrinfo_pkginfo_get_tep_name(pkginfo, &tepname_tmp) != PMINFO_R_OK)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_SYSTEM_ERROR, __FUNCTION__, NULL);
+
+	if (tepname_tmp != NULL)
+		*name = strdup(tepname_tmp);
+
+	if (*name == NULL)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY, __FUNCTION__, NULL);
+
+	pkgmgrinfo_pkginfo_destroy_pkginfo(pkginfo);
+
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
+
 API int package_info_is_system_package(package_info_h package_info, bool *system)
 {
 	bool pkg_info_value = false;

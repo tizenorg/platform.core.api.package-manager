@@ -219,7 +219,7 @@ API int package_manager_request_set_mode(package_manager_request_h request,
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-int package_manager_request_set_tep(package_manager_request_h request,
+API int package_manager_request_set_tep(package_manager_request_h request,
 				     const char *tep_path)
 {
 	int retval = 0;
