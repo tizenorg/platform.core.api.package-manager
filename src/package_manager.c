@@ -44,8 +44,6 @@ struct package_manager_s {
 	pkgmgr_mode mode;
 	event_info *head;
 	package_manager_event_cb event_cb;
-	package_manager_global_event_cb global_event_cb;
-	void *global_user_data;
 	void *user_data;
 };
 
@@ -790,12 +788,6 @@ static int global_event_handler(uid_t target_uid, int req_id, const char *pkg_ty
 					  event_type,
 					  PACKAGE_MANAGER_EVENT_STATE_STARTED,
 					  0, PACKAGE_MANAGER_ERROR_NONE, manager->user_data);
-		if (manager->global_event_cb)
-			manager->global_event_cb(target_uid, pkg_type, pkg_name,
-					  event_type,
-					  PACKAGE_MANAGER_EVENT_STATE_STARTED,
-					  0, PACKAGE_MANAGER_ERROR_NONE, manager->global_user_data);
-
 	} else if (strcasecmp(key, "install_percent") == 0
 		   || strcasecmp(key, "progress_percent") == 0) {
 		if (__find_event
@@ -811,13 +803,6 @@ static int global_event_handler(uid_t target_uid, int req_id, const char *pkg_ty
 						  atoi(val),
 						  PACKAGE_MANAGER_ERROR_NONE,
 						  manager->user_data);
-			if (manager->global_event_cb)
-				manager->global_event_cb(target_uid, pkg_type, pkg_name,
-						  event_type,
-						  PACKAGE_MANAGER_EVENT_STATE_PROCESSING,
-						  atoi(val),
-						  PACKAGE_MANAGER_ERROR_NONE,
-						  manager->global_user_data);
 		}
 
 	} else if (strcasecmp(key, "error") == 0) {
@@ -837,13 +822,6 @@ static int global_event_handler(uid_t target_uid, int req_id, const char *pkg_ty
 						  0,
 						  PACKAGE_MANAGER_ERROR_NONE,
 						  manager->user_data);
-			if (manager->global_event_cb)
-				manager->global_event_cb(target_uid, pkg_type,
-						  pkg_name, event_type,
-						  PACKAGE_MANAGER_EVENT_STATE_FAILED,
-						  0,
-						  PACKAGE_MANAGER_ERROR_NONE,
-						  manager->global_user_data);
 		}
 	} else if (strcasecmp(key, "end") == 0) {
 		if (__find_event
@@ -857,13 +835,6 @@ static int global_event_handler(uid_t target_uid, int req_id, const char *pkg_ty
 							  100,
 							  PACKAGE_MANAGER_ERROR_NONE,
 							  manager->user_data);
-				if (manager->global_event_cb)
-					manager->global_event_cb(target_uid, pkg_type,
-							  pkg_name, event_type,
-							  PACKAGE_MANAGER_EVENT_STATE_COMPLETED,
-							  100,
-							  PACKAGE_MANAGER_ERROR_NONE,
-							  manager->global_user_data);
 			}
 		} else {
 			if (strcasecmp(key, "ok") != 0) {
@@ -874,13 +845,6 @@ static int global_event_handler(uid_t target_uid, int req_id, const char *pkg_ty
 							  0,
 							  PACKAGE_MANAGER_ERROR_NONE,
 							  manager->user_data);
-				if (manager->global_event_cb)
-					manager->global_event_cb(target_uid, pkg_type,
-							  pkg_name, event_type,
-							  PACKAGE_MANAGER_EVENT_STATE_FAILED,
-							  0,
-							  PACKAGE_MANAGER_ERROR_NONE,
-							  manager->global_user_data);
 			}
 		}
 	}
@@ -941,80 +905,17 @@ API int package_manager_unset_event_cb(package_manager_h manager)
 	manager->event_cb = NULL;
 	manager->user_data = NULL;
 
-	if (manager->global_event_cb == NULL) {
-		retval = pkgmgr_client_remove_listen_status(manager->pc);
-		if (retval == PKGMGR_R_EINVAL)
-			return
-				 package_manager_error
-				 (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
-				  NULL);
-		else if (retval == PKGMGR_R_ERROR)
-			return
-				 package_manager_error
-				 (PACKAGE_MANAGER_ERROR_SYSTEM_ERROR, __FUNCTION__,
-				  NULL);
-	}
-
-	return PACKAGE_MANAGER_ERROR_NONE;
-}
-
-API int package_manager_set_global_event_cb(package_manager_h manager,
-				 package_manager_global_event_cb callback,
-				 void *user_data)
-{
-
-	int retval;
-	retval = check_privilege(PRIVILEGE_PACKAGE_MANAGER_INFO);
-	if (retval != PACKAGE_MANAGER_ERROR_NONE)
-		return retval;
-
-	if (package_manager_validate_handle(manager)) {
+	retval = pkgmgr_client_remove_listen_status(manager->pc);
+	if (retval == PKGMGR_R_EINVAL)
 		return
-		    package_manager_error
-		    (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
-		     NULL);
-	}
-
-	if (getuid() >= REGULAR_USER) {
-		_LOGE("Regular user is not allowed for this api");
-		return PACKAGE_MANAGER_ERROR_PERMISSION_DENIED;
-	}
-
-	manager->global_event_cb = callback;
-	manager->global_user_data = user_data;
-
-	pkgmgr_client_listen_status(manager->pc, global_event_handler, manager);
-
-	return PACKAGE_MANAGER_ERROR_NONE;
-}
-
-API int package_manager_unset_global_event_cb(package_manager_h manager)
-{
-	int retval;
-
-	if (manager == NULL) {
+			 package_manager_error
+			 (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
+			  NULL);
+	else if (retval == PKGMGR_R_ERROR)
 		return
-		    package_manager_error
-		    (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
-		     NULL);
-	}
-
-	manager->global_event_cb = NULL;
-	manager->global_user_data = NULL;
-
-	if (manager->event_cb == NULL) {
-		retval = pkgmgr_client_remove_listen_status(manager->pc);
-		if (retval == PKGMGR_R_EINVAL)
-			return
-				 package_manager_error
-				 (PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__,
-				  NULL);
-		else if (retval == PKGMGR_R_ERROR)
-			return
-				 package_manager_error
-				 (PACKAGE_MANAGER_ERROR_SYSTEM_ERROR, __FUNCTION__,
-				  NULL);
-	}
+			 package_manager_error
+			 (PACKAGE_MANAGER_ERROR_SYSTEM_ERROR, __FUNCTION__,
+			  NULL);
 
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
