@@ -29,8 +29,6 @@
 #include <sys/types.h>
 #include <fcntl.h>
 
-#include <glib.h>
-
 #include <package_manager.h>
 
 
@@ -114,44 +112,13 @@ static int _get_appinfo(const char *appid)
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-static void _global_event_cb(uid_t target_uid, const char *type,
-		const char *package, package_manager_event_type_e event_type,
-		package_manager_event_state_e event_state, int progress,
-		package_manager_error_e error, void *user_data)
-{
-	fprintf(stderr, "uid[%u] type[%s] pkgid[%s] event_type[%d] "
-			"event_state[%d] progress[%d] error[%d]\n",
-			target_uid, type, package, event_type, event_state,
-			progress, error);
-}
-
-static int _listen_event(void)
-{
-	int ret;
-	package_manager_h manager;
-
-	ret = package_manager_create(&manager);
-	if (ret != PACKAGE_MANAGER_ERROR_NONE)
-		return ret;
-
-	ret = package_manager_set_global_event_cb(manager, _global_event_cb,
-			NULL);
-	if (ret != PACKAGE_MANAGER_ERROR_NONE)
-		return ret;
-
-	return PACKAGE_MANAGER_ERROR_NONE;
-}
-
 int main(int argc, char **argv)
 {
-	GMainLoop *loop;
 	int ret = PACKAGE_MANAGER_ERROR_NONE;
 
 	if (1 == argc) {
-		if (_listen_event()) {
-			fprintf(stderr, "Register event listener failed\n");
-			return EXIT_FAILURE;
-		}
+		fprintf(stderr, "mising operand\n");
+		return EXIT_FAILURE;
 	} else if (2 == argc) {
 		ret = _get_packageinfo(argv[1]);
 	} else if (3 == argc) {
@@ -166,11 +133,6 @@ int main(int argc, char **argv)
 	if (ret != PACKAGE_MANAGER_ERROR_NONE) {
 		fprintf(stderr, "There are some problems\n");
 		return EXIT_FAILURE;
-	}
-
-	if (1 == argc) {
-		loop = g_main_loop_new(NULL, FALSE);
-		g_main_loop_run(loop);
 	}
 
 	return EXIT_SUCCESS;
