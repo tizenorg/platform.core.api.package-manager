@@ -145,6 +145,7 @@ API int package_manager_request_destroy(package_manager_request_h request)
 
 	pkgmgr_client_free(request->pc);
 	request->pc = NULL;
+	free(request->tep_path);
 	free(request);
 
 	return PACKAGE_MANAGER_ERROR_NONE;
