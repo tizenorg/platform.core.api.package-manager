@@ -194,7 +194,7 @@ API int package_manager_request_set_type(package_manager_request_h request,
 		     NULL);
 	}
 
-	request->pkg_type = pkg_type;
+	request->pkg_type = strdup(pkg_type);
 
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
