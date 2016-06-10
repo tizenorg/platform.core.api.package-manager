@@ -31,6 +31,13 @@ Requires: %{name} = %{version}-%{release}
 The Package Manager API provides functions to install, uninstall the package,
 and also privides event listening function. (DEV)
 
+%package test
+Summary:  Package Manager API (Test Tool)
+Group:    System/API
+Requires: %{name} = %{version}-%{release}
+
+%description test
+This package includes test tool for package manager apis.
 
 %prep
 %setup -q
@@ -55,7 +62,6 @@ rm -rf %{buildroot}
 %files
 %manifest %{name}.manifest
 %{_libdir}/libcapi-appfw-package-manager.so.*
-%{_bindir}/pkgmgr_tool
 
 %files devel
 %manifest %{name}.manifest
@@ -64,4 +70,6 @@ rm -rf %{buildroot}
 %{_libdir}/libcapi-appfw-package-manager.so
 %{_libdir}/pkgconfig/*.pc
 
-
+%files test
+%manifest %{name}.manifest
+%{_bindir}/pkgmgr_tool
