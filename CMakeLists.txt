@@ -17,6 +17,7 @@ pkg_check_modules(PKGS REQUIRED
 	pkgmgr-info
 	libtzplatform-config
 	cynara-client
+	cynara-session
 	)
 FOREACH(FLAGS ${PKGS_CFLAGS})
 	SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${FLAGS}")
