@@ -309,7 +309,7 @@ END:
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
-API int package_info_get_tep_name (package_info_h package_info, char **name)
+API int package_info_get_tep_name(package_info_h package_info, char **name)
 {
 	pkgmgrinfo_pkginfo_h pkginfo;
 	char *tepname_tmp = NULL;
