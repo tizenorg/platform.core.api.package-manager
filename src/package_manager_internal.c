@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
 #include <unistd.h>
 
 #include <pkgmgr-info.h>
 #include <tzplatform_config.h>
 #include <cynara-client.h>
-#include <stdio.h>
-#include <fcntl.h>
+#include <cynara-session.h>
 
 #include "package_info.h"
 #include "package_manager.h"
 #include "package_manager_internal.h"
 
-#define SMACK_LABEL_LEN 255
+#define MAX_SMACK_LABEL_LEN 255
 #define GLOBAL_USER tzplatform_getuid(TZ_SYS_GLOBALAPP_USER)
 
 typedef struct _foreach_pkg_context_ {
@@ -36,73 +38,64 @@ typedef struct _foreach_pkg_context_ {
 
 int check_privilege(privilege_type type)
 {
-
 	cynara *p_cynara;
-
-	int fd = 0;
-	int ret = 0;
-
-	char subject_label[SMACK_LABEL_LEN + 1] = "";
-	char uid[10] = {0,};
-	char *client_session = "";
-
-	ret = cynara_initialize(&p_cynara, NULL);
-	if (ret != CYNARA_API_SUCCESS) {
-		LOGE("cannot init cynara [%d] failed!", ret);
-		ret = PACKAGE_MANAGER_ERROR_IO_ERROR;
-		goto out;
-	}
+	int fd;
+	int ret;
+	char subject_label[MAX_SMACK_LABEL_LEN] = { 0 };
+	char uid[10];
+	char *session;
+	const char *privilege;
 
 	fd = open("/proc/self/attr/current", O_RDONLY);
 	if (fd < 0) {
-		LOGE("open [%d] failed!", errno);
-		ret = PACKAGE_MANAGER_ERROR_IO_ERROR;
-		goto out;
+		LOGE("open failed: %d", errno);
+		return PACKAGE_MANAGER_ERROR_IO_ERROR;
 	}
 
-	ret = read(fd, subject_label, SMACK_LABEL_LEN);
+	ret = read(fd, subject_label, sizeof(subject_label));
 	if (ret < 0) {
-		LOGE("read [%d] failed!", errno);
+		LOGE("read failed: %d", errno);
 		close(fd);
-		ret = PACKAGE_MANAGER_ERROR_IO_ERROR;
-		goto out;
+		return PACKAGE_MANAGER_ERROR_IO_ERROR;
 	}
 	close(fd);
 
-	snprintf(uid, 10, "%d", getuid());
-
-	if (type == PRIVILEGE_PACKAGE_MANAGER_INFO) {
-		ret = cynara_check(p_cynara, subject_label, client_session, uid,
-				"http://tizen.org/privilege/packagemanager.info");
-		if (ret != CYNARA_API_ACCESS_ALLOWED) {
-			LOGE("cynara access check [%d] failed!", ret);
-			ret = PACKAGE_MANAGER_ERROR_PERMISSION_DENIED;
-			goto out;
-		}
-	} else if (type == PRIVILEGE_PACKAGE_MANAGER_ADMIN) {
-		ret = cynara_check(p_cynara, subject_label, client_session, uid,
-				"http://tizen.org/privilege/packagemanager.admin");
-		if (ret != CYNARA_API_ACCESS_ALLOWED) {
-			LOGE("cynara access check [%d] failed!", ret);
-			ret = PACKAGE_MANAGER_ERROR_PERMISSION_DENIED;
-			goto out;
-		}
-	} else if (type == PRIVILEGE_PACKAGE_MANAGER_CACHE) {
-		ret = cynara_check(p_cynara, subject_label, client_session, uid,
-				"http://tizen.org/privilege/packagemanager.clearcache");
-		if (ret != CYNARA_API_ACCESS_ALLOWED) {
-			LOGE("cynara access check [%d] failed!", ret);
-			ret = PACKAGE_MANAGER_ERROR_PERMISSION_DENIED;
-			goto out;
-		}
+	ret = cynara_initialize(&p_cynara, NULL);
+	if (ret != CYNARA_API_SUCCESS) {
+		LOGE("init cynara failed: %d", ret);
+		return PACKAGE_MANAGER_ERROR_IO_ERROR;
 	}
 
-	ret = PACKAGE_MANAGER_ERROR_NONE;
-out:
-	if (p_cynara)
-		cynara_finish(p_cynara);
+	snprintf(uid, 10, "%d", getuid());
+	session = cynara_session_from_pid(getpid());
 
-	return ret;
+	switch (type) {
+	case PRIVILEGE_PACKAGE_MANAGER_INFO:
+		privilege = "http://tizen.org/privilege/packagemanager.info";
+		break;
+	case PRIVILEGE_PACKAGE_MANAGER_ADMIN:
+		privilege = "http://tizen.org/privilege/packagemanager.admin";
+		break;
+	case PRIVILEGE_PACKAGE_MANAGER_CACHE:
+		privilege =
+			"http://tizen.org/privilege/packagemanager.clearcache";
+		break;
+	default:
+		privilege = NULL;
+		break;
+	}
+
+	ret = cynara_check(p_cynara, subject_label, session, uid, privilege);
+
+	free(session);
+	cynara_finish(p_cynara);
+
+	if (ret != CYNARA_API_ACCESS_ALLOWED) {
+		LOGE("cynara access check failed: %d", ret);
+		return PACKAGE_MANAGER_ERROR_PERMISSION_DENIED;
+	}
+
+	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
 static const char *package_manager_error_to_string(package_manager_error_e

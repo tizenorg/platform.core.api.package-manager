@@ -17,6 +17,7 @@ BuildRequires:  pkgconfig(capi-base-common)
 BuildRequires:  pkgconfig(libtzplatform-config)
 BuildRequires:  pkgconfig(glib-2.0)
 BuildRequires:  pkgconfig(cynara-client)
+BuildRequires:  pkgconfig(cynara-session)
 
 %description
 The Package Manager API provides functions to install, uninstall the package,
