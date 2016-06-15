@@ -51,10 +51,8 @@ struct package_manager_request_s {
 	int handle_id;
 	client_type ctype;
 	pkgmgr_client *pc;
-	const char *pkg_type;
-	const char *pkg_path;
-	const char *pkg_name;
-	const char *tep_path;
+	char *pkg_type;
+	char *tep_path;
 	pkgmgr_mode mode;
 	event_info *head;
 	package_manager_request_event_cb event_cb;
@@ -236,7 +234,7 @@ API int package_manager_request_set_tep(package_manager_request_h request,
 		return retval;
 
 	if (request->tep_path)
-		free((void *)request->tep_path);
+		free(request->tep_path);
 
 	request->tep_path = strdup(tep_path);
 	request->tep_move = true;
@@ -485,17 +483,16 @@ API int package_manager_request_install(package_manager_request_h request,
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 
 	int request_id = 0;
-	request->pkg_path = path;
 	uid_t uid = getuid();
 	if (uid != GLOBAL_USER)
 		request_id = pkgmgr_client_usr_install(request->pc, request->pkg_type, NULL,
-							request->pkg_path, NULL,
+							path, NULL,
 							request->mode, request_event_handler,
 							request,
 							uid);
 	else
 		request_id = pkgmgr_client_install(request->pc, request->pkg_type, NULL,
-							request->pkg_path, NULL,
+							path, NULL,
 							request->mode, request_event_handler,
 							request);
 
@@ -533,15 +530,14 @@ API int package_manager_request_uninstall(package_manager_request_h request,
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 
 	int request_id = 0;
-	request->pkg_name = name;
 	uid_t uid = getuid();
 	if (uid != GLOBAL_USER)
 		request_id = pkgmgr_client_usr_uninstall(request->pc, request->pkg_type,
-								request->pkg_name, request->mode,
+								name, request->mode,
 								request_event_handler, request, uid);
 	else
 		request_id = pkgmgr_client_uninstall(request->pc, request->pkg_type,
-								request->pkg_name, request->mode,
+								name, request->mode,
 								request_event_handler, request);
 
 	if (request_id == PKGMGR_R_EINVAL)
@@ -578,15 +574,14 @@ API int package_manager_request_move(package_manager_request_h request,
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 
 	int ret = 0;
-	request->pkg_name = name;
 	uid_t uid = getuid();
 	if (uid != GLOBAL_USER)
 		ret = pkgmgr_client_usr_request_service(PM_REQUEST_MOVE, move_type,
-				request->pc, request->pkg_type, request->pkg_name,
+				request->pc, request->pkg_type, name,
 				uid, NULL, request_event_handler, NULL);
 	else
 		ret = pkgmgr_client_request_service(PM_REQUEST_MOVE, move_type,
-				request->pc, request->pkg_type, request->pkg_name,
+				request->pc, request->pkg_type, name,
 				NULL, request_event_handler, NULL);
 
 	if (ret == PKGMGR_R_EINVAL)
