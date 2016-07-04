@@ -142,22 +142,23 @@ int package_info_get_package_info(const char *package, package_info_h *package_i
 
 static int package_info_foreach_package_info_cb(const pkgmgrinfo_pkginfo_h handle, void *user_data)
 {
-	char *pkg_name = NULL;
 	foreach_pkg_context_s *foreach_pkg_context = user_data;
 	package_info_h package_info = NULL;
 	bool r = false;
+	int ret;
 
 	if (handle == NULL || foreach_pkg_context == NULL) {
 		package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 		return PMINFO_R_EINVAL;
 	}
 
-	pkgmgrinfo_pkginfo_get_pkgname(handle, &pkg_name);
+	ret = package_info_create_with_pkginfo(handle, &package_info);
+	if (ret != PACKAGE_MANAGER_ERROR_NONE)
+		return package_manager_error(ret, __FUNCTION__, NULL);
 
-	if (package_info_create(pkg_name, &package_info) == PACKAGE_MANAGER_ERROR_NONE) {
-		r = foreach_pkg_context->callback(package_info, foreach_pkg_context->user_data);
-		package_info_destroy(package_info);
-	}
+	r = foreach_pkg_context->callback(package_info, foreach_pkg_context->user_data);
+
+	package_info_destroy_handle(package_info);
 
 	return (r == true) ? PMINFO_R_OK : PMINFO_R_ERROR;
 }
