@@ -153,12 +153,22 @@ static int package_info_foreach_package_info_cb(const pkgmgrinfo_pkginfo_h handl
 		return PMINFO_R_EINVAL;
 	}
 
-	pkgmgrinfo_pkginfo_get_pkgname(handle, &pkg_name);
+	package_info = calloc(1, sizeof(struct package_info_s));
+	if (package_info == NULL)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY, __FUNCTION__, NULL);
 
-	if (package_info_create(pkg_name, &package_info) == PACKAGE_MANAGER_ERROR_NONE) {
-		r = foreach_pkg_context->callback(package_info, foreach_pkg_context->user_data);
-		package_info_destroy(package_info);
+	pkgmgrinfo_pkginfo_get_pkgid(handle, &pkg_name);
+	package_info->package = strdup(pkg_name);
+	if (package_info->package == NULL) {
+		free(package_info);
+		return package_manager_error(PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY, __FUNCTION__, NULL);
 	}
+
+	package_info->pkgmgr_pkginfo = handle;
+	r = foreach_pkg_context->callback(package_info, foreach_pkg_context->user_data);
+
+	free(package_info->package);
+	free(package_info);
 
 	return (r == true) ? PMINFO_R_OK : PMINFO_R_ERROR;
 }

@@ -30,11 +30,6 @@
 
 #define GLOBAL_USER tzplatform_getuid(TZ_SYS_GLOBALAPP_USER)
 
-struct package_info_s {
-	char *package;
-	pkgmgrinfo_pkginfo_h pkgmgr_pkginfo;
-};
-
 struct package_cert_info_s {
 	char *package;
 	pkgmgrinfo_certinfo_h pkgmgrinfo_certinfo;

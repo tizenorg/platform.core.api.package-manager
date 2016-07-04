@@ -44,6 +44,11 @@ typedef enum {
 	PRIVILEGE_PACKAGE_MANAGER_CACHE
 } privilege_type;
 
+struct package_info_s {
+	char *package;
+	pkgmgrinfo_pkginfo_h pkgmgr_pkginfo;
+};
+
 int check_privilege(privilege_type type);
 
 int package_manager_error(package_manager_error_e error, const char *function, const char *description);
