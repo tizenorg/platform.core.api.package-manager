@@ -486,3 +486,37 @@ API int package_info_foreach_privilege_info(package_info_h package_info, package
 
 	return ret;
 }
+
+int package_info_create_with_pkginfo(pkgmgrinfo_pkginfo_h pkg_handle, package_info_h *package_info)
+{
+	package_info_h pkg_info = NULL;
+	char *pkg_name = NULL;
+
+	pkg_info = calloc(1, sizeof(struct package_info_s));
+	if (pkg_info == NULL)
+		return PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY;
+
+	pkgmgrinfo_pkginfo_get_pkgid(pkg_handle, &pkg_name);
+	if (pkg_name == NULL)
+		return PACKAGE_MANAGER_ERROR_SYSTEM_ERROR;
+
+	pkg_info->package = strdup(pkg_name);
+	if (pkg_info->package == NULL)
+		return PACKAGE_MANAGER_ERROR_OUT_OF_MEMORY;
+
+	pkg_info->pkgmgr_pkginfo = pkg_handle;
+	*package_info = pkg_info;
+
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
+
+int package_info_destroy_handle(package_info_h handle)
+{
+	if (handle == NULL)
+		return PACKAGE_MANAGER_ERROR_INVALID_PARAMETER;
+
+	free(handle->package);
+	free(handle);
+
+	return PACKAGE_MANAGER_ERROR_NONE;
+}
