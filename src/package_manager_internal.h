@@ -54,6 +54,10 @@ int package_info_foreach_package_info(package_manager_package_info_cb callback,	
 
 int package_info_filter_foreach_package_info(pkgmgrinfo_pkginfo_filter_h handle, package_manager_package_info_cb callback, void *user_data);
 
+extern int package_info_create_with_pkginfo(pkgmgrinfo_pkginfo_h pkg_handle, package_info_h *package_info);
+
+extern int package_info_destroy_handle(package_info_h handle);
+
 #ifdef __cplusplus
 }
 #endif
