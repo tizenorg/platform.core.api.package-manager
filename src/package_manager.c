@@ -209,10 +209,7 @@ API int package_manager_request_set_mode(package_manager_request_h request,
 		     NULL);
 	}
 
-	if (mode == PACKAGE_MANAGER_REQUEST_MODE_QUIET)
-		request->mode = PM_QUIET;
-	else
-		request->mode = PM_DEFAULT;
+	/* request mode is not used anymore */
 
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
@@ -483,18 +480,8 @@ API int package_manager_request_install(package_manager_request_h request,
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 
 	int request_id = 0;
-	uid_t uid = getuid();
-	if (uid != GLOBAL_USER)
-		request_id = pkgmgr_client_usr_install(request->pc, request->pkg_type, NULL,
-							path, NULL,
-							request->mode, request_event_handler,
-							request,
-							uid);
-	else
-		request_id = pkgmgr_client_install(request->pc, request->pkg_type, NULL,
-							path, NULL,
-							request->mode, request_event_handler,
-							request);
+	request_id = pkgmgr_client_install(request->pc, request->pkg_type, NULL,
+			path, NULL, request->mode, request_event_handler, request);
 
 	if (request_id == PKGMGR_R_EINVAL)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
@@ -530,15 +517,8 @@ API int package_manager_request_uninstall(package_manager_request_h request,
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 
 	int request_id = 0;
-	uid_t uid = getuid();
-	if (uid != GLOBAL_USER)
-		request_id = pkgmgr_client_usr_uninstall(request->pc, request->pkg_type,
-								name, request->mode,
-								request_event_handler, request, uid);
-	else
-		request_id = pkgmgr_client_uninstall(request->pc, request->pkg_type,
-								name, request->mode,
-								request_event_handler, request);
+	request_id = pkgmgr_client_uninstall(request->pc, request->pkg_type,
+			name, request->mode, request_event_handler, request);
 
 	if (request_id == PKGMGR_R_EINVAL)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
@@ -574,15 +554,9 @@ API int package_manager_request_move(package_manager_request_h request,
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 
 	int ret = 0;
-	uid_t uid = getuid();
-	if (uid != GLOBAL_USER)
-		ret = pkgmgr_client_usr_request_service(PM_REQUEST_MOVE, move_type,
-				request->pc, request->pkg_type, name,
-				uid, NULL, request_event_handler, NULL);
-	else
-		ret = pkgmgr_client_request_service(PM_REQUEST_MOVE, move_type,
-				request->pc, request->pkg_type, name,
-				NULL, request_event_handler, NULL);
+	ret = pkgmgr_client_request_service(PM_REQUEST_MOVE, move_type,
+			request->pc, request->pkg_type, name,
+			NULL, request_event_handler, NULL);
 
 	if (ret == PKGMGR_R_EINVAL)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
@@ -931,14 +905,8 @@ API int package_manager_get_package_id_by_app_id(const char *app_id, char **pack
 	if (app_id == NULL || package_id == NULL)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 
-	uid_t uid = getuid();
-	if (uid != GLOBAL_USER) {
-		if (pkgmgrinfo_appinfo_get_usr_appinfo(app_id, uid, &pkgmgrinfo_appinfo) != PMINFO_R_OK)
-			return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
-	} else {
-		if (pkgmgrinfo_appinfo_get_appinfo(app_id, &pkgmgrinfo_appinfo) != PMINFO_R_OK)
-			return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
-	}
+	if (pkgmgrinfo_appinfo_get_appinfo(app_id, &pkgmgrinfo_appinfo) != PMINFO_R_OK)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
 	retval = pkgmgrinfo_appinfo_get_pkgname(pkgmgrinfo_appinfo, &pkg_id);
 	if (retval != PMINFO_R_OK)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
@@ -991,17 +959,11 @@ API int package_manager_foreach_package_info(package_manager_package_info_cb cal
 API int package_manager_compare_package_cert_info(const char *lhs_package_id, const char *rhs_package_id, package_manager_compare_result_type_e *compare_result)
 {
 	pkgmgrinfo_cert_compare_result_type_e result;
-	uid_t uid = getuid();
 
 	if (lhs_package_id == NULL || rhs_package_id == NULL || compare_result == NULL)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
-	if (uid != GLOBAL_USER) {
-		if (pkgmgrinfo_pkginfo_compare_usr_pkg_cert_info(lhs_package_id, rhs_package_id, uid, &result) != PKGMGR_R_OK)
-			return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
-	} else {
-		if (pkgmgrinfo_pkginfo_compare_pkg_cert_info(lhs_package_id, rhs_package_id, &result) != PKGMGR_R_OK)
-			return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
-	}
+	if (pkgmgrinfo_pkginfo_compare_pkg_cert_info(lhs_package_id, rhs_package_id, &result) != PKGMGR_R_OK)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
 	*compare_result = (package_manager_compare_result_type_e)result;
 
 	return PACKAGE_MANAGER_ERROR_NONE;
@@ -1010,17 +972,11 @@ API int package_manager_compare_package_cert_info(const char *lhs_package_id, co
 API int package_manager_compare_app_cert_info(const char *lhs_app_id, const char *rhs_app_id, package_manager_compare_result_type_e *compare_result)
 {
 	pkgmgrinfo_cert_compare_result_type_e result;
-	uid_t uid = getuid();
 
 	if (lhs_app_id == NULL || rhs_app_id == NULL || compare_result == NULL)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
-	if (uid != GLOBAL_USER) {
-		if (pkgmgrinfo_pkginfo_compare_usr_app_cert_info(lhs_app_id, rhs_app_id, uid, &result) != PKGMGR_R_OK)
-			return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
-	} else {
-		if (pkgmgrinfo_pkginfo_compare_app_cert_info(lhs_app_id, rhs_app_id, &result) != PKGMGR_R_OK)
-			return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
-	}
+	if (pkgmgrinfo_pkginfo_compare_app_cert_info(lhs_app_id, rhs_app_id, &result) != PKGMGR_R_OK)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
 
 	*compare_result = (package_manager_compare_result_type_e)result;
 
@@ -1040,32 +996,18 @@ API int package_manager_is_preload_package_by_app_id(const char *app_id, bool *p
 
 	char *pkg_id = NULL;
 	bool is_preload = 0;
-	uid_t uid = getuid();
-	if (uid != GLOBAL_USER) {
-		if (pkgmgrinfo_appinfo_get_usr_appinfo(app_id, uid, &pkgmgrinfo_appinfo) != PMINFO_R_OK)
-			return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
-	} else {
-		if (pkgmgrinfo_appinfo_get_appinfo(app_id, &pkgmgrinfo_appinfo) != PMINFO_R_OK)
-			return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
-	}
+	if (pkgmgrinfo_appinfo_get_appinfo(app_id, &pkgmgrinfo_appinfo) != PMINFO_R_OK)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
 
 	retval = pkgmgrinfo_appinfo_get_pkgname(pkgmgrinfo_appinfo, &pkg_id);
 	if (retval != PMINFO_R_OK) {
 		pkgmgrinfo_appinfo_destroy_appinfo(pkgmgrinfo_appinfo);
 		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
 	}
-	if (uid != GLOBAL_USER) {
-		if (pkgmgrinfo_pkginfo_get_usr_pkginfo(pkg_id, uid, &pkgmgrinfo_pkginfo) != PMINFO_R_OK) {
-			pkgmgrinfo_appinfo_destroy_appinfo(pkgmgrinfo_appinfo);
-			pkgmgrinfo_pkginfo_destroy_pkginfo(pkgmgrinfo_pkginfo);
-			return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
-		}
-	} else {
-		if (pkgmgrinfo_pkginfo_get_pkginfo(pkg_id, &pkgmgrinfo_pkginfo) != PMINFO_R_OK) {
-			pkgmgrinfo_appinfo_destroy_appinfo(pkgmgrinfo_appinfo);
-			pkgmgrinfo_pkginfo_destroy_pkginfo(pkgmgrinfo_pkginfo);
-			return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
-		}
+	if (pkgmgrinfo_pkginfo_get_pkginfo(pkg_id, &pkgmgrinfo_pkginfo) != PMINFO_R_OK) {
+		pkgmgrinfo_appinfo_destroy_appinfo(pkgmgrinfo_appinfo);
+		pkgmgrinfo_pkginfo_destroy_pkginfo(pkgmgrinfo_pkginfo);
+		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
 	}
 	if (pkgmgrinfo_pkginfo_is_preload(pkgmgrinfo_pkginfo, &is_preload) != PMINFO_R_OK) {
 		pkgmgrinfo_appinfo_destroy_appinfo(pkgmgrinfo_appinfo);
@@ -1094,14 +1036,8 @@ API int package_manager_get_permission_type(const char *app_id, package_manager_
 
 	pkgmgrinfo_appinfo_h pkgmgrinfo_appinfo = NULL;
 	pkgmgrinfo_permission_type permission = 0;
-	uid_t uid = getuid();
-	if (uid != GLOBAL_USER) {
-		if (pkgmgrinfo_appinfo_get_usr_appinfo(app_id, uid, &pkgmgrinfo_appinfo) != PMINFO_R_OK)
-			return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
-	} else {
-		if (pkgmgrinfo_appinfo_get_appinfo(app_id, &pkgmgrinfo_appinfo) != PMINFO_R_OK)
-			return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
-	}
+	if (pkgmgrinfo_appinfo_get_appinfo(app_id, &pkgmgrinfo_appinfo) != PMINFO_R_OK)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
 	retval = pkgmgrinfo_appinfo_get_permission_type(pkgmgrinfo_appinfo, &permission);
 	if (retval != PMINFO_R_OK)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
@@ -1127,7 +1063,7 @@ API int package_manager_clear_cache_dir(const char *package_id)
 	if (retval != PACKAGE_MANAGER_ERROR_NONE)
 		return retval;
 
-	int res = pkgmgr_client_usr_clear_cache_dir(package_id, getuid());
+	int res = pkgmgr_client_clear_cache_dir(package_id);
 	if (res == PKGMGR_R_EINVAL) {
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 	} else if (res == PKGMGR_R_ENOPKG) {
@@ -1228,9 +1164,9 @@ static int _get_pkg_size_info(const char *package_id, void *callback, void *user
 
 	int res = 0;
 	if (strcmp(package_id, PKG_SIZE_INFO_TOTAL) != 0)
-		res = pkgmgr_client_usr_get_package_size_info(pc, package_id, __result_cb, user_data, getuid());
+		res = pkgmgr_client_get_package_size_info(pc, package_id, __result_cb, user_data);
 	else
-		res = pkgmgr_client_usr_get_total_package_size_info(pc, __total_result_cb, user_data, getuid());
+		res = pkgmgr_client_get_total_package_size_info(pc, __total_result_cb, user_data);
 
 	if (res == PKGMGR_R_EINVAL) {
 		pkgmgr_client_free(pc);

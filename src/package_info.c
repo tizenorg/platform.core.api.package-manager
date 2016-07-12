@@ -28,8 +28,6 @@
 #include "package_manager.h"
 #include "package_manager_internal.h"
 
-#define GLOBAL_USER tzplatform_getuid(TZ_SYS_GLOBALAPP_USER)
-
 struct package_info_s {
 	char *package;
 	pkgmgrinfo_pkginfo_h pkgmgr_pkginfo;
@@ -49,18 +47,13 @@ API int package_info_create(const char *package, package_info_h *package_info)
 {
 	package_info_h package_info_created;
 	pkgmgrinfo_pkginfo_h pkgmgr_pkginfo;
-	uid_t uid = getuid();
 
 	if (package == NULL || package_info == NULL)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 
-	if (uid != GLOBAL_USER) {
-		if (pkgmgrinfo_pkginfo_get_usr_pkginfo(package, uid, &pkgmgr_pkginfo) != PKGMGR_R_OK)
-			return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
-	} else {
-		if (pkgmgrinfo_pkginfo_get_pkginfo(package, &pkgmgr_pkginfo) != PKGMGR_R_OK)
-			return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
-	}
+	if (pkgmgrinfo_pkginfo_get_pkginfo(package, &pkgmgr_pkginfo) != PKGMGR_R_OK)
+		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
+
 	package_info_created = calloc(1, sizeof(struct package_info_s));
 
 	if (package_info_created == NULL) {
@@ -116,20 +109,19 @@ API int package_info_foreach_app_from_package(package_info_h package_info, packa
 		.user_data = user_data,
 	};
 	pkgmgrinfo_pkginfo_h pkgmgr_pkginfo;
-	uid_t uid = getuid();
 
 	if (package_info == NULL || callback == NULL)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 
-	if (pkgmgrinfo_pkginfo_get_usr_pkginfo(package_info->package, uid, &pkgmgr_pkginfo) != PKGMGR_R_OK)
+	if (pkgmgrinfo_pkginfo_get_pkginfo(package_info->package, &pkgmgr_pkginfo) != PKGMGR_R_OK)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE, __FUNCTION__, NULL);
 
 	if (comp_type == PACKAGE_INFO_ALLAPP)
-		pkgmgrinfo_appinfo_get_usr_list(pkgmgr_pkginfo, PMINFO_ALL_APP, package_info_foreach_app_cb, &foreach_app_context, uid);
+		pkgmgrinfo_appinfo_get_list(pkgmgr_pkginfo, PMINFO_ALL_APP, package_info_foreach_app_cb, &foreach_app_context);
 	if (comp_type == PACKAGE_INFO_UIAPP)
-		pkgmgrinfo_appinfo_get_usr_list(pkgmgr_pkginfo, PMINFO_UI_APP, package_info_foreach_app_cb, &foreach_app_context, uid);
+		pkgmgrinfo_appinfo_get_list(pkgmgr_pkginfo, PMINFO_UI_APP, package_info_foreach_app_cb, &foreach_app_context);
 	if (comp_type == PACKAGE_INFO_SERVICEAPP)
-		pkgmgrinfo_appinfo_get_usr_list(pkgmgr_pkginfo, PMINFO_SVC_APP, package_info_foreach_app_cb, &foreach_app_context, uid);
+		pkgmgrinfo_appinfo_get_list(pkgmgr_pkginfo, PMINFO_SVC_APP, package_info_foreach_app_cb, &foreach_app_context);
 	return PACKAGE_MANAGER_ERROR_NONE;
 }
 
@@ -439,7 +431,6 @@ API int package_info_foreach_cert_info(package_info_h package_info, package_info
 	pkgmgrinfo_certinfo_h handle = NULL;
 	int i = 0;
 	const char *cert_value = NULL;
-	uid_t uid = getuid();
 
 	if (package_info == NULL || callback == NULL)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
@@ -448,7 +439,7 @@ API int package_info_foreach_cert_info(package_info_h package_info, package_info
 	if (retval != PMINFO_R_OK)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);
 
-	retval = pkgmgrinfo_pkginfo_load_certinfo(package_info->package, handle, uid);
+	retval = pkgmgrinfo_pkginfo_load_certinfo(package_info->package, handle, getuid());
 	if (retval != PMINFO_R_OK) {
 		pkgmgrinfo_pkginfo_destroy_certinfo(handle);
 		return package_manager_error(PACKAGE_MANAGER_ERROR_IO_ERROR, __FUNCTION__, NULL);

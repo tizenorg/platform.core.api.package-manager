@@ -29,7 +29,6 @@
 #include "package_manager_internal.h"
 
 #define MAX_SMACK_LABEL_LEN 255
-#define GLOBAL_USER tzplatform_getuid(TZ_SYS_GLOBALAPP_USER)
 
 typedef struct _foreach_pkg_context_ {
 	package_manager_package_info_cb callback;
@@ -174,11 +173,7 @@ int package_info_foreach_package_info(package_manager_package_info_cb callback, 
 	if (callback == NULL)
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 
-	uid_t uid = getuid();
-	if (uid != GLOBAL_USER)
-		ret = pkgmgrinfo_pkginfo_get_usr_list(package_info_foreach_package_info_cb, &foreach_pkg_context, uid);
-	else
-		ret = pkgmgrinfo_pkginfo_get_list(package_info_foreach_package_info_cb, &foreach_pkg_context);
+	ret = pkgmgrinfo_pkginfo_get_list(package_info_foreach_package_info_cb, &foreach_pkg_context);
 
 	if (ret < 0)
 		return PACKAGE_MANAGER_ERROR_NO_SUCH_PACKAGE;
@@ -193,16 +188,11 @@ int package_info_filter_foreach_package_info(pkgmgrinfo_pkginfo_filter_h handle,
 		.user_data = user_data,
 	};
 	int ret;
-	uid_t uid;
 
 	if ((handle == NULL) || (callback == NULL))
 		return package_manager_error(PACKAGE_MANAGER_ERROR_INVALID_PARAMETER, __FUNCTION__, NULL);
 
-	uid = getuid();
-	if (uid != GLOBAL_USER)
-		ret = pkgmgrinfo_pkginfo_usr_filter_foreach_pkginfo(handle, package_info_foreach_package_info_cb, &foreach_pkg_context, uid);
-	else
-		ret = pkgmgrinfo_pkginfo_filter_foreach_pkginfo(handle, package_info_foreach_package_info_cb, &foreach_pkg_context);
+	ret = pkgmgrinfo_pkginfo_filter_foreach_pkginfo(handle, package_info_foreach_package_info_cb, &foreach_pkg_context);
 
 	if (ret < 0)
 		return PACKAGE_MANAGER_ERROR_IO_ERROR;
