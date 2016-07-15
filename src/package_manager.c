@@ -52,11 +52,9 @@ struct package_manager_request_s {
 	client_type ctype;
 	pkgmgr_client *pc;
 	char *pkg_type;
-	char *tep_path;
 	pkgmgr_mode mode;
 	event_info *head;
 	package_manager_request_event_cb event_cb;
-	bool tep_move;
 	void *user_data;
 };
 
@@ -144,7 +142,6 @@ API int package_manager_request_destroy(package_manager_request_h request)
 	pkgmgr_client_free(request->pc);
 	request->pc = NULL;
 	free(request->pkg_type);
-	free(request->tep_path);
 	free(request);
 
 	return PACKAGE_MANAGER_ERROR_NONE;
@@ -230,13 +227,7 @@ API int package_manager_request_set_tep(package_manager_request_h request,
 	if (retval != PACKAGE_MANAGER_ERROR_NONE)
 		return retval;
 
-	if (request->tep_path)
-		free(request->tep_path);
-
-	request->tep_path = strdup(tep_path);
-	request->tep_move = true;
-
-	if (request->tep_path == NULL)
+	if (pkgmgr_client_set_tep_path(request->pc, tep_path, true))
 		return PACKAGE_MANAGER_ERROR_SYSTEM_ERROR;
 
 	return PACKAGE_MANAGER_ERROR_NONE;
