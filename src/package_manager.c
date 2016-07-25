@@ -1094,7 +1094,7 @@ static void __free_client(gpointer data)
 
 static void __initialize_cb_table(void)
 {
-	__cb_table = g_hash_table_new_full(g_int_hash, g_int_equal, __free_client, NULL);
+	__cb_table = g_hash_table_new_full(g_direct_hash, g_direct_equal, __free_client, NULL);
 }
 
 static void __result_cb(pkgmgr_client *pc, const char *pkgid, const pkg_size_info_t *result, void *user_data)
