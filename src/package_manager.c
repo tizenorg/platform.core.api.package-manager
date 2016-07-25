@@ -1103,6 +1103,7 @@ static void __result_cb(pkgmgr_client *pc, const char *pkgid, const pkg_size_inf
 	if (callback == NULL) {
 		_LOGE("callback is null.");
 		g_hash_table_remove(__cb_table, pc);
+		pkgmgr_client_free(pc);
 		return;
 	}
 
@@ -1117,6 +1118,7 @@ static void __result_cb(pkgmgr_client *pc, const char *pkgid, const pkg_size_inf
 	callback(pkgid, (package_size_info_h)&size_info, user_data);
 
 	g_hash_table_remove(__cb_table, pc);
+	pkgmgr_client_free(pc);
 }
 
 static void __total_result_cb(pkgmgr_client *pc, const pkg_size_info_t *result, void *user_data)
@@ -1125,6 +1127,7 @@ static void __total_result_cb(pkgmgr_client *pc, const pkg_size_info_t *result, 
 	if (callback == NULL) {
 		_LOGE("callback is null.");
 		g_hash_table_remove(__cb_table, pc);
+		pkgmgr_client_free(pc);
 		return;
 	}
 
@@ -1139,6 +1142,7 @@ static void __total_result_cb(pkgmgr_client *pc, const pkg_size_info_t *result, 
 	callback((package_size_info_h)&size_info, user_data);
 
 	g_hash_table_remove(__cb_table, pc);
+	pkgmgr_client_free(pc);
 }
 
 static int _get_pkg_size_info(const char *package_id, void *callback, void *user_data)
